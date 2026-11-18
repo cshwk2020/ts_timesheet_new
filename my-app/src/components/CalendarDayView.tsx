@@ -4,7 +4,7 @@ import type { RootState } from '../reducers';
 import { addTask, setTaskTypes } from '../actions/taskActions';
 import { fetchTaskTypes } from '../services/taskTypeService';
 import { toLocalDateKey } from '../utils/dateUtils';
-
+import './CalendarDayView.css';
  
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
@@ -76,28 +76,36 @@ const CalendarDayView: React.FC = () => {
     <div className="day-view">
       {/* Header: date nav + single task-type combobox */}
       <div className="day-view-header">
-        <button onClick={goPrevDay} aria-label="Previous day">‹</button>
-        <div className="day-view-date">
-          {selectedDate.toLocaleDateString(undefined, {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric',
-          })}
-        </div>
-        <button onClick={goNextDay} aria-label="Next day">›</button>
+      
+            <div></div>
+            
+            <div>
+                <button onClick={goPrevDay} aria-label="Previous day">‹</button>
+                {selectedDate.toLocaleDateString(undefined, {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                })}
+                <button onClick={goNextDay} aria-label="Next day">›</button>  
+            </div>
 
-        <select
-          value={taskTypeId}
-          onChange={(e) => setTaskTypeId(e.target.value)}
-          disabled={taskTypes.length === 0}
-          className="day-view-type"
-        >
-          {taskTypes.length === 0 && <option value="">Loading types…</option>}
-          {taskTypes.map((t) => (
-            <option key={t.id} value={t.id}>{t.name}</option>
-          ))}
-        </select>
+            
+
+
+            <select
+                value={taskTypeId}
+                onChange={(e) => setTaskTypeId(e.target.value)}
+                disabled={taskTypes.length === 0}
+                className="day-view-type"
+                >
+                {taskTypes.length === 0 && <option value="">Loading types…</option>}
+                {taskTypes.map((t) => (
+                    <option key={t.id} value={t.id}>{t.name}</option>
+                ))}
+            </select>
+
+       
       </div>
 
       {/* 24 hour cells */}
