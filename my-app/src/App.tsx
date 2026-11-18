@@ -1,19 +1,12 @@
-import './App.css'
-import { Provider } from "react-redux";
-import { store } from "./store";
-import { TimesheetPage } from "./components/TimesheetPage";
-
+import './App.css';
+import CalendarMain from './components/CalendarMain';
 
 function App() {
-  
-
   return (
-    <>  
-      <Provider store={store}>
-        <TimesheetPage />
-      </Provider>
+    <>
+      <CalendarMain />
     </>
-  )
+  );
 }
 
-export default App
+export default App;

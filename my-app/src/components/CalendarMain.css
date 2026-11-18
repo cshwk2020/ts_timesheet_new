@@ -1,0 +1,36 @@
+
+.switch-toggle {
+
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  background: #f0f0f0;
+  border-radius: 10px;
+  width: fit-content;
+  margin: 0 auto;
+}
+
+.switch-toggle-btn {
+  border: none;
+  background: transparent;
+  padding: 0.5rem 1rem;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #555;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.switch-toggle-btn:hover {
+  color: #111;
+}
+
+.switch-toggle-btn.active {
+  background: #fff;
+  color: #111;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+}

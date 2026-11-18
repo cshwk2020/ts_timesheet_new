@@ -1,31 +1,36 @@
-// reducers/taskReducer.ts 或合併入 rootReducer
-import type { TaskCategory, Task } from "../types/timesheetTypes";
-import type { TaskAction } from "../actions/taskActions";
+// src/reducers/taskReducer.ts
+import {
+  type TaskState,
+  type TaskActionTypes,
+  ADD_TASK,
+  SET_TASK_TYPES,
+} from '../types';
 
-export type TaskState = {
-  taskCategories: TaskCategory[];
-  tasks: Task[];
+const initialState: TaskState = {
+  tasks: [],
+  taskTypes: [],
 };
 
-export const initialTaskState: TaskState = {
-  taskCategories: [
-    { id: "study", userId: "u1", taskCatDesc: "Study", lastUpdatedAt: "" },
-    { id: "life", userId: "u1", taskCatDesc: "Life", lastUpdatedAt: "" }
-  ],
-  tasks: [
-    { id: "react", userId: "u1", taskCategoryId: "study", taskDesc: "React TS", lastUpdatedAt: "" },
-    { id: "laravel", userId: "u1", taskCategoryId: "study", taskDesc: "Laravel", lastUpdatedAt: "" },
-    { id: "sleep", userId: "u1", taskCategoryId: "life", taskDesc: "Sleep", lastUpdatedAt: "" }
-  ]
-};
-
-export const taskReducer = (state = initialTaskState, action: TaskAction): TaskState => {
+const taskReducer = (
+  state = initialState,
+  action: TaskActionTypes
+): TaskState => {
   switch (action.type) {
+    case ADD_TASK:
+      return {
+        ...state,
+        tasks: [...state.tasks, action.payload],
+      };
+
+    case SET_TASK_TYPES:
+      return {
+        ...state,
+        taskTypes: action.payload,
+      };
+
     default:
-        return state;
-  
       return state;
   }
 };
 
-
+export default taskReducer;
