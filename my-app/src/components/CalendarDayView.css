@@ -1,0 +1,41 @@
+/* ===== row grid ===== */
+.day-view-hours {
+  display: flex;
+  flex-direction: column;
+  border-top: 1px solid #eee;
+}
+
+.hour-row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  align-items: stretch;          /* let the tall input drive row height */
+  border-bottom: 1px solid #eee;
+}
+
+.hour-label {
+  font-size: 0.75rem;
+  color: #888;
+  padding: 10px 8px;
+  border-right: 1px solid #eee;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* single tall input per hour */
+.hour-input {
+  width: 100%;
+  box-sizing: border-box;
+  min-height: 72px;              /* 👈 taller row */
+  padding: 8px 10px;
+  font: inherit;
+  font-size: 0.85rem;
+  line-height: 1.35;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  outline: none;
+  resize: vertical;              /* optional: let user drag taller */
+}
+.hour-input:hover { background: #fafafa; border-color: #eee; }
+.hour-input:focus { background: #fff; border-color: #3461ff; }
