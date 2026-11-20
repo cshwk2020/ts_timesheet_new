@@ -14,12 +14,20 @@ export interface TaskType {
  * Task as stored in DB / Redux.
  * `task_type_id` is a FK to TaskType.id
  */
+// src/types/index.ts
+
 export interface Task {
   id: string;
-  datetime: string;          // ISO string
+  from_datetime: string; // Keep for UI formatting
+  to_datetime: string;   // Keep for UI formatting
+  from_timestamp: number; // 👈 Fast checking
+  to_timestamp: number;   // 👈 Fast checking
   task_details: string;
-  task_type_id: string;      // FK → TaskType.id
+  task_type_id: string;
 }
+
+
+// ... rest of your types (TaskState, actions, etc.)
 
 export interface TaskState {
   tasks: Task[];

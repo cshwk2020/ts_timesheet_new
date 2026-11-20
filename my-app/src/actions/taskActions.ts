@@ -1,16 +1,21 @@
-// src/actions/taskActions.ts
-import { ADD_TASK, SET_TASK_TYPES, } from '../types';
-import type { Task, TaskType } from '../types';
+import { ADD_TASK, SET_TASK_TYPES, type Task, type TaskType } from '../types';
 import { generateId } from '../utils/dateUtils';
 
+/**
+ * Add a single task with a start and end time
+ */
 export const addTask = (
-  datetime: string,
+  from_datetime: string,
+  to_datetime: string,
   task_details: string,
   task_type_id: string
 ) => {
   const newTask: Task = {
     id: generateId(),
-    datetime,
+    from_datetime,
+    to_datetime,
+    from_timestamp: new Date(from_datetime).getTime(),  
+    to_timestamp: new Date(to_datetime).getTime(),   
     task_details,
     task_type_id,
   };
@@ -21,7 +26,12 @@ export const addTask = (
   };
 };
 
-export const setTaskTypes = (taskTypes: TaskType[]) => ({
-  type: SET_TASK_TYPES,
-  payload: taskTypes,
-});
+/**
+ * Hydrate the task types into Redux (usually called once in App.tsx)
+ */
+export const setTaskTypes = (taskTypes: TaskType[]) => {
+  return {
+    type: SET_TASK_TYPES,
+    payload: taskTypes,
+  };
+};

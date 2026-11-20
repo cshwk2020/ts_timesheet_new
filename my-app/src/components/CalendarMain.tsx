@@ -1,47 +1,48 @@
 import React, { useState } from 'react';
-import './CalendarMain.css';
 import CalendarDayView from './CalendarDayView';
-import CalendarMonthView from './CalendarMonthView';
-import CalendarWeekView from './CalendarWeekView';
-import CalendarYearView from './CalendarYearView';
-
-type CalendarView = 'day' | 'week' | 'month' | 'year';
-
-const VIEWS: CalendarView[] = ['day', 'week', 'month', 'year'];
+import { TaskCommandBar } from './TaskCommandBar';
 
 const CalendarMain: React.FC = () => {
-  const [view, setView] = useState<CalendarView>('day');
-
-  const renderView = () => {
-    switch (view) {
-      case 'day':   return <CalendarDayView />;
-      case 'week':  return <CalendarWeekView />;
-      case 'month': return <CalendarMonthView />;
-      case 'year':  return <CalendarYearView />;
-    }
-  };
+  const [currentView, setCurrentView] = useState<'day' | 'week' | 'month'>('day');
   
+  // Bar State
+  const [isBarOpen, setIsBarOpen] = useState(false);
+  const [clickedDate, setClickedDate] = useState<Date>(new Date());
+  const [clickedHour, setClickedHour] = useState<number>(0);
+
+  // 1. OPEN: Triggered by clicking a cell
+  const handleCellClick = (date: Date, hour: number) => {
+    setClickedDate(date);
+    setClickedHour(hour);
+    setIsBarOpen(true);
+  };
+
+  // 2. CLOSE: Triggered by onClose (saved) or clicking outside
+  const handleCloseBar = () => {
+    setIsBarOpen(false);
+  };
+
   return (
-    <div>
-      <div className="switch-toggle">
-        {VIEWS.map((v) => (
-          <button
-            key={v}
-            type="button"
-            className={`switch-toggle-btn ${view === v ? 'active' : ''}`}
-            onClick={() => setView(v)}
-          >
-            {v.charAt(0).toUpperCase() + v.slice(1)}
-          </button>
-        ))}
+    <div className="calendar-main">
+      {/* View Toggle */}
+      <div className="switch-toggle" style={{ marginBottom: '20px' }}>
+        <button onClick={() => setCurrentView('day')} className={currentView === 'day' ? 'active' : ''}>Day</button>
+        <button onClick={() => setCurrentView('week')} className={currentView === 'week' ? 'active' : ''}>Week</button>
+        <button onClick={() => setCurrentView('month')} className={currentView === 'month' ? 'active' : ''}>Month</button>
       </div>
 
- 
-      <div className="calendar-view-container">
-        {renderView()}
+      {/* Grid (Click to open bar) */}
+      <div className="view-container" style={{ paddingBottom: '100px' }}>
+        {currentView === 'day' && <CalendarDayView onCellClick={handleCellClick} />}
       </div>
 
-       
+      {/* Slide up Bar */}
+      <TaskCommandBar 
+        isOpen={isBarOpen} 
+        onClose={handleCloseBar} // 👈 This hides it after save
+        selectedDate={clickedDate} 
+        selectedHour={clickedHour} 
+      />
     </div>
   );
 };

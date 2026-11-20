@@ -1,0 +1,168 @@
+/* 1. The Backdrop (Dark overlay) */
+.command-bar-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.3); /* Semi-transparent */
+  opacity: 0;
+  pointer-events: none; /* Ignore clicks when hidden */
+  transition: opacity 0.3s ease;
+  z-index: 999;
+}
+
+.command-bar-backdrop.open {
+  opacity: 1;
+  pointer-events: auto; /* Catch clicks when open */
+}
+
+/* 2. The Slide-Up Wrapper */
+.command-bar-wrapper {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  z-index: 1000;
+  
+  /* Hidden state (off-screen) */
+  transform: translateY(100%);
+  transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
+  pointer-events: none; 
+}
+
+.command-bar-wrapper.open {
+  transform: translateY(0);
+  pointer-events: auto;
+  padding-bottom: 20px; /* The 20% gap */
+}
+
+/* 3. The Actual Box */
+.command-bar-content {
+  width: 90%;
+  max-width: 700px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1rem solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+}
+
+/* 4. Responsive Layout */
+.time-section {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.time-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+   
+}
+
+.time-group label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: #666;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+ 
+}
+
+.time-inputs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+ 
+}
+
+.time-inputs input[type="time"] {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  background: white;
+  color: #666;
+}
+
+.date-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 10px;
+  background: #eef4ff;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #3461ff;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.2s;
+  height: 38px;
+  box-sizing: border-box;
+  
+}
+
+.date-badge:hover {
+  background: #dbe7ff;
+}
+
+.date-badge input[type="date"] {
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 0.85rem;
+  color: #3461ff;
+  font-weight: 600;
+  outline: none;
+  width: 110px;
+}
+
+.time-arrow {
+  font-size: 1.2rem;
+  color: #888;
+  padding-bottom: 10px;
+  
+}
+
+.task-section {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+
+}
+
+.task-input, .type-select {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.task-input:focus { border-color: #3461ff; }
+
+
+/* Landscape Mode */
+/*
+@media (min-width: 768px) {
+  .command-bar-content {
+    flex-direction: row;
+    align-items: center;
+  }
+  .time-section { flex: 0 0 50%; }
+  .task-section { flex: 1; }
+}
+*/

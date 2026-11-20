@@ -1,49 +1,20 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
+import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
 import type { RootState } from '../reducers';
-import { addTask, setTaskTypes } from '../actions/taskActions';
-import { fetchTaskTypes } from '../services/taskTypeService';
-import { toLocalDateKey } from '../utils/dateUtils';
 import './CalendarDayView.css';
- 
+
+interface Props {
+  // Tell the parent which date and hour was clicked
+  onCellClick: (date: Date, hour: number) => void;
+}
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 
-const CalendarDayView: React.FC = () => {
+const CalendarDayView: React.FC<Props> = ({ onCellClick }) => {
   const tasks = useSelector((state: RootState) => state.tasks.tasks);
-  const taskTypes = useSelector((state: RootState) => state.tasks.taskTypes);
-  const dispatch = useDispatch();
-
+  
+  // Keep the date local to this view for navigation
   const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
-  const [taskTypeId, setTaskTypeId] = useState<string>('');
-  const [drafts, setDrafts] = useState<Record<number, string>>({}); // hour → text
-
-  // Hydrate task types once (moved here so the component is self-contained)
-  useEffect(() => {
-    let cancelled = false;
-    fetchTaskTypes().then((types) => {
-      if (cancelled) return;
-      dispatch(setTaskTypes(types));
-      if (types.length > 0) setTaskTypeId((prev) => prev || types[0].id);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [dispatch]);
-
-  const dateKey = toLocalDateKey(selectedDate);
-
-  // Bucket tasks by hour for the selected day
-  const tasksByHour = useMemo(() => {
-    const map: Record<number, typeof tasks> = {};
-    HOURS.forEach((h) => (map[h] = []));
-    for (const t of tasks) {
-      const d = new Date(t.datetime);
-      if (toLocalDateKey(d) !== dateKey) continue;
-      map[d.getHours()].push(t);
-    }
-    return map;
-  }, [tasks, dateKey]);
 
   const goPrevDay = () => {
     const d = new Date(selectedDate);
@@ -57,94 +28,75 @@ const CalendarDayView: React.FC = () => {
     setSelectedDate(d);
   };
 
-  const handleAdd = (hour: number) => {
-    const text = (drafts[hour] ?? '').trim();
-    if (!text || !taskTypeId) return;
+  // Helper to check if a task overlaps with a specific hour
+  const getTasksForHour = (date: Date, hour: number) => {
+    const cellStart = new Date(date);
+    cellStart.setHours(hour, 0, 0, 0);
+    const cellEnd = new Date(date);
+    cellEnd.setHours(hour, 59, 59, 999);
 
-    // Build an ISO datetime for that day at that hour
-    const dt = new Date(selectedDate);
-    dt.setHours(hour, 0, 0, 0);
-
-    dispatch(addTask(dt.toISOString(), text, taskTypeId));
-    setDrafts((prev) => ({ ...prev, [hour]: '' }));
+    return tasks.filter((t) => {
+      const taskStart = new Date(t.from_datetime).getTime();
+      const taskEnd = new Date(t.to_datetime).getTime();
+      
+      // Overlap check: Task starts before cell ends AND ends after cell starts
+      return taskStart <= cellEnd.getTime() && taskEnd >= cellStart.getTime();
+    });
   };
-
-  const labelFor = (id: string): string =>
-    taskTypes.find((t) => t.id === id)?.name ?? id;
 
   return (
     <div className="day-view">
-      {/* Header: date nav + single task-type combobox */}
+      {/* Header for day navigation */}
       <div className="day-view-header">
-      
-            <div></div>
-            
-            <div>
-                <button onClick={goPrevDay} aria-label="Previous day">‹</button>
-                {selectedDate.toLocaleDateString(undefined, {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                })}
-                <button onClick={goNextDay} aria-label="Next day">›</button>  
-            </div>
-
-            
-
-
-            <select
-                value={taskTypeId}
-                onChange={(e) => setTaskTypeId(e.target.value)}
-                disabled={taskTypes.length === 0}
-                className="day-view-type"
-                >
-                {taskTypes.length === 0 && <option value="">Loading types…</option>}
-                {taskTypes.map((t) => (
-                    <option key={t.id} value={t.id}>{t.name}</option>
-                ))}
-            </select>
-
-       
+        <button onClick={goPrevDay} aria-label="Previous day">‹</button>
+        <div className="day-view-date">
+          {selectedDate.toLocaleDateString(undefined, {
+            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+          })}
+        </div>
+        <button onClick={goNextDay} aria-label="Next day">›</button>
       </div>
 
-      {/* 24 hour cells */}
       <div className="day-view-hours">
         {HOURS.map((hour) => {
-          const hh = String(hour).padStart(2, '0');
-          const cellTasks = tasksByHour[hour] ?? [];
+          const cellTasks = getTasksForHour(selectedDate, hour);
+          
+          // Create a date object representing this exact cell's time
+          const cellDate = new Date(selectedDate);
+          cellDate.setHours(hour, 0, 0, 0);
 
           return (
-            <div key={hour} className="hour-cell">
-              <div className="hour-label">{hh}:00</div>
+            <div 
+              key={hour} 
+              className="hour-row clickable"
+              onClick={() => onCellClick(cellDate, hour)}
+            >
+              <div className="hour-label">{String(hour).padStart(2, '0')}:00</div>
+              
+              <div className="hour-display">
+                {cellTasks.length > 0 ? (
+                  cellTasks.map((t) => {
+                    const start = new Date(t.from_datetime);
+                    const end = new Date(t.to_datetime);
+                    
+                    // Is this the first hour of the task?
+                    const isStart = start.getHours() === hour && start.getDate() === cellDate.getDate();
+                    
+                    // Format start time for the badge
+                    const timeLabel = isStart 
+                      ? `${String(start.getHours()).padStart(2,'0')}:${String(start.getMinutes()).padStart(2,'0')}` 
+                      : '↳';
 
-              <div className="hour-content">
-                {cellTasks.map((t) => (
-                  <div key={t.id} className="task-chip">
-                    <span className="task-chip-type">{labelFor(t.task_type_id)}</span>
-                    <span className="task-chip-details">{t.task_details}</span>
-                  </div>
-                ))}
-
-                <div className="hour-add">
-                  <input
-                    type="text"
-                    placeholder="Add task…"
-                    value={drafts[hour] ?? ''}
-                    onChange={(e) =>
-                      setDrafts((prev) => ({ ...prev, [hour]: e.target.value }))
-                    }
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleAdd(hour);
-                    }}
-                  />
-                  <button
-                    onClick={() => handleAdd(hour)}
-                    disabled={!(drafts[hour] ?? '').trim() || !taskTypeId}
-                  >
-                    +
-                  </button>
-                </div>
+                    return (
+                      <div key={t.id} className={`task-line ${!isStart ? 'continued' : ''}`}>
+                        <span className="task-time">{timeLabel}</span>
+                        <span className="task-details">{t.task_details}</span>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <span className="empty-placeholder">Click to add task…</span>
+                )}
               </div>
             </div>
           );

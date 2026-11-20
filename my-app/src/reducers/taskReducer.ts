@@ -16,18 +16,20 @@ const taskReducer = (
   action: TaskActionTypes
 ): TaskState => {
   switch (action.type) {
+
     case ADD_TASK:
+
       return {
         ...state,
         tasks: [...state.tasks, action.payload],
       };
 
-    case SET_TASK_TYPES:
-      return {
-        ...state,
-        taskTypes: action.payload,
-      };
-
+      case SET_TASK_TYPES:
+        return {
+          ...state,
+          taskTypes: action.payload,
+        };
+ 
     default:
       return state;
   }
