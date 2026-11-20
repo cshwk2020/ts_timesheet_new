@@ -4,6 +4,7 @@ import {
   type TaskActionTypes,
   ADD_TASK,
   SET_TASK_TYPES,
+  UPDATE_TASK,
 } from '../types';
 
 const initialState: TaskState = {
@@ -24,7 +25,15 @@ const taskReducer = (
         tasks: [...state.tasks, action.payload],
       };
 
-      case SET_TASK_TYPES:
+    case UPDATE_TASK:
+      return {
+        ...state,
+        tasks: state.tasks.map((t) => 
+          t.id === action.payload.id ? action.payload : t
+        ),
+      };
+
+    case SET_TASK_TYPES:
         return {
           ...state,
           taskTypes: action.payload,

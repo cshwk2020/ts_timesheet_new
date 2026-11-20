@@ -1,8 +1,16 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import CalendarDayView from './CalendarDayView';
 import { TaskCommandBar } from './TaskCommandBar';
+import { clearError } from '../actions/errorActions';
+import type { Task } from '../types';
+import type { RootState } from '../reducers';
+import { useDispatch, useSelector } from 'react-redux';
+import { ErrorModal } from './ErrorModal';
 
 const CalendarMain: React.FC = () => {
+
+  const dispatch = useDispatch();
+  
   const [currentView, setCurrentView] = useState<'day' | 'week' | 'month'>('day');
   
   // Bar State
@@ -10,17 +18,43 @@ const CalendarMain: React.FC = () => {
   const [clickedDate, setClickedDate] = useState<Date>(new Date());
   const [clickedHour, setClickedHour] = useState<number>(0);
 
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+
+  const errorMessage = useSelector((state: RootState) => {
+    console.log("Current Redux error state:", state.error);
+    return state.error?.message;
+  });
+
   // 1. OPEN: Triggered by clicking a cell
   const handleCellClick = (date: Date, hour: number) => {
     setClickedDate(date);
     setClickedHour(hour);
+    setEditingTask(null);
     setIsBarOpen(true);
   };
 
-  // 2. CLOSE: Triggered by onClose (saved) or clicking outside
+  const handleTaskClick = (task: Task) => {
+    console.log("Task clicked!", task);
+    setClickedDate(new Date(task.from_datetime)); 
+    setClickedHour(new Date(task.from_datetime).getHours());
+    setEditingTask(task); // Set editing state (we are EDITING)
+    setIsBarOpen(true);
+  };
+
   const handleCloseBar = () => {
     setIsBarOpen(false);
   };
+
+  /*
+  useEffect(() => {
+    if (errorMessage) {
+      const timer = setTimeout(() => {
+        dispatch(clearError());
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [errorMessage, dispatch]);
+  */
 
   return (
     <div className="calendar-main">
@@ -31,9 +65,21 @@ const CalendarMain: React.FC = () => {
         <button onClick={() => setCurrentView('month')} className={currentView === 'month' ? 'active' : ''}>Month</button>
       </div>
 
+
+      {errorMessage && (
+        <ErrorModal 
+        message={errorMessage} 
+        onClose={() => dispatch(clearError())} 
+      />
+      )}
+
+
       {/* Grid (Click to open bar) */}
       <div className="view-container" style={{ paddingBottom: '100px' }}>
-        {currentView === 'day' && <CalendarDayView onCellClick={handleCellClick} />}
+        {currentView === 'day' && <CalendarDayView 
+          onCellClick={handleCellClick} 
+          onTaskClick={handleTaskClick} 
+        />}
       </div>
 
       {/* Slide up Bar */}
@@ -42,9 +88,12 @@ const CalendarMain: React.FC = () => {
         onClose={handleCloseBar} // 👈 This hides it after save
         selectedDate={clickedDate} 
         selectedHour={clickedHour} 
+        editingTask={editingTask}
       />
     </div>
   );
 };
 
 export default CalendarMain;
+
+ 

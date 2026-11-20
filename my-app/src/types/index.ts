@@ -27,7 +27,7 @@ export interface Task {
 }
 
 
-// ... rest of your types (TaskState, actions, etc.)
+// 
 
 export interface TaskState {
   tasks: Task[];
@@ -37,16 +37,51 @@ export interface TaskState {
 // Action Types
 export const ADD_TASK = 'ADD_TASK';
 export const SET_TASK_TYPES = 'SET_TASK_TYPES';   // 👈 new: hydrate types from DB
+export const UPDATE_TASK = 'UPDATE_TASK';
+
 
 // Action Interfaces
-interface AddTaskAction {
+export interface AddTaskAction {
   type: typeof ADD_TASK;
   payload: Task;
 }
 
-interface SetTaskTypesAction {
+export interface SetTaskTypesAction {
   type: typeof SET_TASK_TYPES;
   payload: TaskType[];
 }
 
-export type TaskActionTypes = AddTaskAction | SetTaskTypesAction;
+
+export interface UpdateTaskAction {
+  type: typeof UPDATE_TASK;
+  payload: Task; // The fully updated task
+}
+
+//
+export type TaskActionTypes = AddTaskAction | SetTaskTypesAction | UpdateTaskAction;
+
+
+
+// ERROR Actions
+
+export interface ErrorState {
+  message: string | null;
+}
+
+export const SET_ERROR = 'SET_ERROR';
+export const CLEAR_ERROR = 'CLEAR_ERROR';
+
+export interface SetErrorAction {
+  type: typeof SET_ERROR;
+  payload: string;
+}
+
+export interface ClearErrorAction {
+  type: typeof CLEAR_ERROR;
+}
+ 
+
+
+// ALL Actions
+
+export type AppActionTypes = TaskActionTypes | SetErrorAction | ClearErrorAction;

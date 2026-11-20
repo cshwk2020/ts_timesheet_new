@@ -10,6 +10,7 @@
   pointer-events: none; /* Ignore clicks when hidden */
   transition: opacity 0.3s ease;
   z-index: 999;
+  
 }
 
 .command-bar-backdrop.open {
@@ -31,6 +32,7 @@
   transform: translateY(100%);
   transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
   pointer-events: none; 
+
 }
 
 .command-bar-wrapper.open {
@@ -39,21 +41,46 @@
   padding-bottom: 20px; /* The 20% gap */
 }
 
-/* 3. The Actual Box */
 .command-bar-content {
-  width: 90%;
-  max-width: 700px;
+  width: 95%;
+  max-width: 80%;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1rem solid rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   border-radius: 12px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  
+  display: flex;
+  flex-direction: row; 
+  align-items: stretch; 
+  gap: 16px;
+  padding: 16px;
+}
+
+
+@media (max-width: 768px) {
+  .command-bar-content {
+    flex-direction: column;
+  }
+}
+
+
+
+
+/* =========================================
+   LEFT COLUMN
+   ========================================= */
+.command-left-col {
+  /* 👇 Use max-content so it only takes as much space as it needs */
+  flex: 0 0 auto; 
   display: flex;
   flex-direction: column;
   gap: 12px;
-  padding: 16px;
+  /* 👇 Set a minimum width so the time inputs don't get squished */
+  min-width: 250px; 
 }
+
+ 
 
 /* 4. Responsive Layout */
 .time-section {
@@ -136,11 +163,12 @@
   
 }
 
+
 .task-section {
   display: flex;
+  flex-direction: column;
   gap: 12px;
   width: 100%;
-
 }
 
 .task-input, .type-select {
@@ -153,6 +181,75 @@
 }
 
 .task-input:focus { border-color: #3461ff; }
+
+
+
+
+/* The standard Save Button */
+.submit-btn {
+  width: 100%;
+  height: 44px; 
+  background-color: #3461ff; /* Solid Blue */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: auto; 
+  transition: background-color 0.2s, opacity 0.2s;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background-color: #2548cc; /* Darker blue on hover */
+}
+
+/* 👇 The Disabled State (Dim Blue) */
+.submit-btn:disabled {
+  background-color: #a0b4ff; /* Dimmed blue */
+  color: rgba(255, 255, 255, 0.7); /* Slightly faded text */
+  cursor: not-allowed; /* Shows a 'no entry' cursor */
+  opacity: 0.7;
+}
+
+
+
+
+/* =========================================
+   RIGHT COLUMN
+   ========================================= */
+.command-right-col {
+  /* 👇 flex: 1 makes this column stretch to fill ALL remaining horizontal space */
+  flex: 1; 
+  display: flex;
+  /* 👇 Stretch vertically to match the LHS height */
+  align-items: stretch; 
+  /* Prevent the column from growing infinitely wide if the text is huge */
+  min-width: 0; 
+}
+
+
+
+.task-textarea {
+  /* 👇 flex: 1 makes the textarea stretch to fill the right column */
+  flex: 1; 
+  width: 100%;
+  height: 100%; /* Matches the LHS height */
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 0.95rem;
+  resize: none; 
+  outline: none;
+  box-sizing: border-box;
+}
+
+
+.task-textarea:focus {
+  border-color: #3461ff;
+}
+
 
 
 /* Landscape Mode */

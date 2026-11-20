@@ -46,20 +46,41 @@
 
 .hour-row {
   display: grid;
-  grid-template-columns: 64px minmax(0, 1fr);   /* hour fixed, main fills rest */
-  align-items: start;
-  border-bottom: 1px solid #eee;
-  min-height: 44px;
+  /* 👇 max-content calculates the exact width needed for the labels */
+  grid-template-columns: max-content minmax(0, 1fr);
+  border-bottom: 1px solid #333; 
+  min-height: 48px;
+  align-items: stretch;
 }
 
 .hour-label {
   font-size: 0.75rem;
   color: #888;
-  padding: 10px 8px;
-  border-right: 1px solid #eee;
-  font-variant-numeric: tabular-nums;
-  text-align: right;
+  border-right: 1px solid #333;
+  background: #1a1a1a;
+  
+  /* 👇 Change to flex-start so it aligns with the top */
+  display: flex;
+  align-items: flex-start; 
+  justify-content: center;
+  
+  /* 👇 Adjust padding to match the top of the task chip */
+  padding-top: 8px; /* Adjust this number to perfectly align with the task-line */
+  padding-left: 16px;
+  padding-right: 16px;
+  padding-bottom: 8px;
+  
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.hour-display {
+  padding: 6px 16px; /* Increased from 4px 8px */
+  display: flex;
+  flex-direction: column;
+  gap: 6px; /* Slightly larger gap between tasks */
+  min-width: 0; 
+  overflow-wrap: break-word;
 }
 
 .hour-main {
@@ -69,6 +90,24 @@
   padding: 4px 8px;
   min-width: 0;       /* allows children (input) to shrink instead of overflowing grid */
 }
+
+/* input fills the whole main column */
+.hour-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 6px 8px;
+  font-size: 0.85rem;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: transparent;
+  outline: none;
+}
+
+.hour-input:hover { background: #fafafa; border-color: #eee; }
+.hour-input:focus { background: #fff; border-color: #3461ff; }
+
+
+
 
 /* tasks already stored in that hour */
 .task-chip {
@@ -87,29 +126,38 @@
   font-weight: 600;
   flex-shrink: 0;
 }
+
 .task-chip-details { color: #222; word-break: break-word; }
 
-/* input fills the whole main column */
-.hour-input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 6px 8px;
-  font-size: 0.85rem;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  background: transparent;
-  outline: none;
-}
-.hour-input:hover { background: #fafafa; border-color: #eee; }
-.hour-input:focus { background: #fff; border-color: #3461ff; }
 
 
 .task-line {
   display: flex;
   gap: 8px;
-  align-items: center;
+  
+  /* 👇 Change this from center to flex-start */
+  align-items: flex-start; 
+  
   font-size: 0.85rem;
-  margin-bottom: 2px;
+  background: #eef4ff; 
+  color: #333;
+  padding: 6px 12px; 
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.task-line:hover {
+  background: #dbe7ff;
+}
+
+.task-details {
+  flex: 1;
+  white-space: pre-wrap; /* Preserves your aaa \n bbb \n ccc line breaks */
+  word-break: break-word;
+  
+  /* 👇 Optional: Add a tiny top margin so the text baseline matches the badge text baseline perfectly */
+  margin-top: 1px; 
 }
 
 .task-line.continued {
@@ -122,9 +170,26 @@
   color: #3461ff;
   font-size: 0.75rem;
   font-weight: 600;
-  background: #eef4ff;
-  padding: 2px 4px;
-  border-radius: 4px;
-  min-width: 40px;
-  text-align: center;
+  white-space: nowrap; /* Prevents the time from breaking into two lines */
+}
+
+.task-duration {
+  font-size: 0.7rem;
+  background: #3461ff;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  
+  /* 👇 Prevents the badge from being squished if text wraps */
+  flex-shrink: 0; 
+}
+
+
+
+/* Make the empty space visually distinct on hover */
+.empty-cell-target:hover .empty-placeholder {
+  opacity: 1;
+  color: #3461ff;
 }

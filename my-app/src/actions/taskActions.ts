@@ -1,4 +1,4 @@
-import { ADD_TASK, SET_TASK_TYPES, type Task, type TaskType } from '../types';
+import { ADD_TASK, SET_TASK_TYPES, UPDATE_TASK, type Task, type TaskType } from '../types';
 import { generateId } from '../utils/dateUtils';
 
 /**
@@ -26,6 +26,13 @@ export const addTask = (
   };
 };
 
+export const updateTask = (updatedTask: Task) => {
+  return {
+    type: UPDATE_TASK,
+    payload: updatedTask,
+  };
+};
+
 /**
  * Hydrate the task types into Redux (usually called once in App.tsx)
  */
@@ -35,3 +42,4 @@ export const setTaskTypes = (taskTypes: TaskType[]) => {
     payload: taskTypes,
   };
 };
+
