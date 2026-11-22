@@ -5,6 +5,7 @@ import {
   ADD_TASK,
   SET_TASK_TYPES,
   UPDATE_TASK,
+  DELETE_TASK,
 } from '../types';
 
 const initialState: TaskState = {
@@ -31,6 +32,12 @@ const taskReducer = (
         tasks: state.tasks.map((t) => 
           t.id === action.payload.id ? action.payload : t
         ),
+      };
+
+    case DELETE_TASK:
+      return {
+        ...state,
+        tasks: state.tasks.filter((t) => t.id !== action.payload),
       };
 
     case SET_TASK_TYPES:

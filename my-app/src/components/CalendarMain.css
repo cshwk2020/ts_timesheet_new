@@ -1,16 +1,29 @@
+/* =========================================
+   MAIN LAYOUT
+   ========================================= */
+.calendar-main {
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  /* Add some padding if needed to keep it off screen edges */
+}
 
+/* =========================================
+   SWITCH TOGGLE (Day/Week/Month)
+   ========================================= */
 .switch-toggle {
-
   display: flex;
   flex-direction: row;
   justify-content: center;
   align-items: center;
   gap: 0.25rem;
   padding: 0.25rem;
-  background: #f0f0f0;
+  
+  /* 👇 Use the code-bg variable for the pill background */
+  background: var(--code-bg); 
   border-radius: 10px;
   width: fit-content;
-  margin: 0 auto;
+  margin: 1rem auto;
 }
 
 .switch-toggle-btn {
@@ -20,17 +33,31 @@
   border-radius: 10px;
   cursor: pointer;
   font-size: 0.9rem;
-  color: #555;
-  transition: background 0.2s ease, color 0.2s ease;
+  
+  /* 👇 Use standard text color */
+  color: var(--text); 
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .switch-toggle-btn:hover {
-  color: #111;
+  /* 👇 Darker/bolder text on hover */
+  color: var(--text-h); 
 }
 
 .switch-toggle-btn.active {
-  background: #fff;
-  color: #111;
+  /* 👇 Use the main app background for the active pill (creates contrast against the code-bg) */
+  background: var(--bg); 
+  color: var(--text-h);
   font-weight: 600;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15); /* Keep the subtle drop shadow */
+  
+  /* Optional: If you want the active text to be your theme's accent color instead */
+  /* color: var(--accent); */
+}
+
+/* Dark mode specific tweak for the toggle shadow */
+@media (prefers-color-scheme: dark) {
+  .switch-toggle-btn.active {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5); /* Darker shadow for dark mode */
+  }
 }

@@ -1,4 +1,4 @@
-import { ADD_TASK, SET_TASK_TYPES, UPDATE_TASK, type Task, type TaskType } from '../types';
+import { ADD_TASK, DELETE_TASK, SET_TASK_TYPES, UPDATE_TASK, type Task, type TaskType } from '../types';
 import { generateId } from '../utils/dateUtils';
 
 /**
@@ -32,6 +32,11 @@ export const updateTask = (updatedTask: Task) => {
     payload: updatedTask,
   };
 };
+
+export const deleteTask = (id: string) => ({
+  type: DELETE_TASK,
+  payload: id,
+});
 
 /**
  * Hydrate the task types into Redux (usually called once in App.tsx)

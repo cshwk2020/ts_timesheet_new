@@ -38,7 +38,10 @@ export interface TaskState {
 export const ADD_TASK = 'ADD_TASK';
 export const SET_TASK_TYPES = 'SET_TASK_TYPES';   // 👈 new: hydrate types from DB
 export const UPDATE_TASK = 'UPDATE_TASK';
+export const DELETE_TASK = 'DELETE_TASK';
 
+ 
+ 
 
 // Action Interfaces
 export interface AddTaskAction {
@@ -57,8 +60,13 @@ export interface UpdateTaskAction {
   payload: Task; // The fully updated task
 }
 
+interface DeleteTaskAction {
+  type: typeof DELETE_TASK;
+  payload: string; // The task ID
+}
+
 //
-export type TaskActionTypes = AddTaskAction | SetTaskTypesAction | UpdateTaskAction;
+export type TaskActionTypes = AddTaskAction | SetTaskTypesAction | UpdateTaskAction | DeleteTaskAction;
 
 
 
@@ -82,6 +90,30 @@ export interface ClearErrorAction {
  
 
 
+// dialog
+
+export interface DialogState {
+  isOpen: boolean;
+  title: string;
+  message: string;
+  type: 'error' | 'confirm';
+  confirmText?: string; // e.g., "Delete", "Save", "Yes"
+  onConfirm?: (() => void) | null; // 👈 The callback function!
+}
+
+export const SHOW_DIALOG = 'SHOW_DIALOG';
+export const HIDE_DIALOG = 'HIDE_DIALOG';
+
+interface ShowDialogAction {
+  type: typeof SHOW_DIALOG;
+  payload: Omit<DialogState, 'isOpen'>;
+}
+
+interface HideDialogAction {
+  type: typeof HIDE_DIALOG;
+}
+
+
 // ALL Actions
 
-export type AppActionTypes = TaskActionTypes | SetErrorAction | ClearErrorAction;
+export type AppActionTypes = TaskActionTypes | SetErrorAction | ClearErrorAction | ShowDialogAction | HideDialogAction;;

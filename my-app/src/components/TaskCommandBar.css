@@ -5,17 +5,16 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.3); /* Semi-transparent */
+  background-color: rgba(0, 0, 0, 0.4); /* Slightly darker for better focus */
   opacity: 0;
-  pointer-events: none; /* Ignore clicks when hidden */
+  pointer-events: none;
   transition: opacity 0.3s ease;
   z-index: 999;
-  
 }
 
 .command-bar-backdrop.open {
   opacity: 1;
-  pointer-events: auto; /* Catch clicks when open */
+  pointer-events: auto;
 }
 
 /* 2. The Slide-Up Wrapper */
@@ -28,27 +27,32 @@
   justify-content: center;
   z-index: 1000;
   
-  /* Hidden state (off-screen) */
   transform: translateY(100%);
   transition: transform 0.35s cubic-bezier(0.25, 1, 0.5, 1);
   pointer-events: none; 
-
 }
 
 .command-bar-wrapper.open {
   transform: translateY(0);
   pointer-events: auto;
-  padding-bottom: 20px; /* The 20% gap */
+  padding-bottom: 20px; 
 }
 
+/* 3. The Command Bar Content */
 .command-bar-content {
+
   width: 95%;
   max-width: 80%;
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  
+  /* 👇 Glassmorphism using theme variables */
+  /* We use a semi-transparent version of the code-bg to let the grid bleed through */
+  background: color-mix(in srgb, var(--bg) 90%, transparent);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  
+  border: 1px solid var(--border);
   border-radius: 12px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  box-shadow: var(--shadow);
   
   display: flex;
   flex-direction: row; 
@@ -58,29 +62,50 @@
 }
 
 
-@media (max-width: 768px) {
-  .command-bar-content {
-    flex-direction: column;
-  }
+
+.command-bar-header {
+  display: flex;
+  flex-direction: column;
+  align-items: end;
+  width: 100%;
+ 
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
+
+}
+
+.delete-icon-btn {
+
+  background: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.2s, color 0.2s;
+  width: fit-content; 
+
 }
 
 
 
+@media (max-width: 768px) {
+  .command-bar-content {
+    flex-direction: column;
+    max-width: 95%;
+  }
+}
 
 /* =========================================
    LEFT COLUMN
    ========================================= */
 .command-left-col {
-  /* 👇 Use max-content so it only takes as much space as it needs */
   flex: 0 0 auto; 
   display: flex;
   flex-direction: column;
   gap: 12px;
-  /* 👇 Set a minimum width so the time inputs don't get squished */
   min-width: 250px; 
 }
-
- 
 
 /* 4. Responsive Layout */
 .time-section {
@@ -94,55 +119,54 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-   
 }
 
 .time-group label {
   font-size: 0.7rem;
   text-transform: uppercase;
-  color: #666;
+  color: var(--text);
   font-weight: 700;
   letter-spacing: 0.5px;
- 
+  opacity: 0.8;
 }
 
 .time-inputs {
   display: flex;
   align-items: center;
   gap: 6px;
- 
 }
 
 .time-inputs input[type="time"] {
   padding: 8px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
   border-radius: 6px;
   font-size: 1rem;
   font-weight: 600;
-  background: white;
-  color: #666;
+  background: var(--bg);
+  color: var(--text-h);
 }
 
+/* 👇 Date Badge using Accent Colors */
 .date-badge {
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 8px 10px;
-  background: #eef4ff;
+  background: var(--accent-bg);
   border-radius: 6px;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #3461ff;
+  color: var(--accent);
   cursor: pointer;
   user-select: none;
   transition: background 0.2s;
   height: 38px;
   box-sizing: border-box;
-  
+  border: 1px solid var(--accent-border);
 }
 
 .date-badge:hover {
-  background: #dbe7ff;
+  background: var(--accent-border);
 }
 
 .date-badge input[type="date"] {
@@ -150,7 +174,7 @@
   background: transparent;
   font-family: inherit;
   font-size: 0.85rem;
-  color: #3461ff;
+  color: var(--accent);
   font-weight: 600;
   outline: none;
   width: 110px;
@@ -158,11 +182,10 @@
 
 .time-arrow {
   font-size: 1.2rem;
-  color: #888;
+  color: var(--text);
+  opacity: 0.5;
   padding-bottom: 10px;
-  
 }
-
 
 .task-section {
   display: flex;
@@ -171,95 +194,81 @@
   width: 100%;
 }
 
-.task-input, .type-select {
+/* Inputs and Dropdowns */
+.type-select {
   flex: 1;
   padding: 10px 12px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
   border-radius: 8px;
   font-size: 1rem;
   outline: none;
+  background: var(--bg);
+  color: var(--text-h);
 }
 
-.task-input:focus { border-color: #3461ff; }
-
-
-
+.type-select:focus { 
+  border-color: var(--accent); 
+}
 
 /* The standard Save Button */
 .submit-btn {
   width: 100%;
   height: 44px; 
-  background-color: #3461ff; /* Solid Blue */
-  color: white;
+  background-color: var(--accent); 
+  color: var(--bg); /* High contrast text based on theme */
   border: none;
   border-radius: 6px;
   font-size: 0.95rem;
   font-weight: 700;
   cursor: pointer;
   margin-top: auto; 
-  transition: background-color 0.2s, opacity 0.2s;
+  transition: opacity 0.2s, transform 0.1s;
 }
 
 .submit-btn:hover:not(:disabled) {
-  background-color: #2548cc; /* Darker blue on hover */
+  opacity: 0.85; 
 }
 
-/* 👇 The Disabled State (Dim Blue) */
+.submit-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+/* 👇 The Disabled State */
 .submit-btn:disabled {
-  background-color: #a0b4ff; /* Dimmed blue */
-  color: rgba(255, 255, 255, 0.7); /* Slightly faded text */
-  cursor: not-allowed; /* Shows a 'no entry' cursor */
-  opacity: 0.7;
+  background-color: var(--border); 
+  color: var(--text); 
+  opacity: 0.5;
+  cursor: not-allowed; 
 }
-
-
-
 
 /* =========================================
    RIGHT COLUMN
    ========================================= */
 .command-right-col {
-  /* 👇 flex: 1 makes this column stretch to fill ALL remaining horizontal space */
   flex: 1; 
   display: flex;
-  /* 👇 Stretch vertically to match the LHS height */
   align-items: stretch; 
-  /* Prevent the column from growing infinitely wide if the text is huge */
   min-width: 0; 
 }
 
-
-
 .task-textarea {
-  /* 👇 flex: 1 makes the textarea stretch to fill the right column */
   flex: 1; 
   width: 100%;
-  height: 100%; /* Matches the LHS height */
+  height: 100%; 
   padding: 12px;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border);
   border-radius: 8px;
   font-family: inherit;
   font-size: 0.95rem;
   resize: none; 
   outline: none;
   box-sizing: border-box;
+  
+  /* Theme Colors */
+  background: var(--bg);
+  color: var(--text-h);
 }
-
 
 .task-textarea:focus {
-  border-color: #3461ff;
+  border-color: var(--accent);
 }
-
-
-
-/* Landscape Mode */
-/*
-@media (min-width: 768px) {
-  .command-bar-content {
-    flex-direction: row;
-    align-items: center;
-  }
-  .time-section { flex: 0 0 50%; }
-  .task-section { flex: 1; }
-}
-*/

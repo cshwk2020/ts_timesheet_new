@@ -6,6 +6,7 @@ import type { Task } from '../types';
 import type { RootState } from '../reducers';
 import { useDispatch, useSelector } from 'react-redux';
 import { ErrorModal } from './ErrorModal';
+import { DialogModal } from './DialogModal';
 
 const CalendarMain: React.FC = () => {
 
@@ -23,6 +24,11 @@ const CalendarMain: React.FC = () => {
   const errorMessage = useSelector((state: RootState) => {
     console.log("Current Redux error state:", state.error);
     return state.error?.message;
+  });
+
+  const dialogMessage = useSelector((state: RootState) => {
+    console.log("Current Redux dialog state:", state.dialog);
+    return state.dialog?.message;
   });
 
   // 1. OPEN: Triggered by clicking a cell
@@ -65,12 +71,19 @@ const CalendarMain: React.FC = () => {
         <button onClick={() => setCurrentView('month')} className={currentView === 'month' ? 'active' : ''}>Month</button>
       </div>
 
+ 
 
       {errorMessage && (
         <ErrorModal 
         message={errorMessage} 
         onClose={() => dispatch(clearError())} 
       />
+      )}
+
+
+
+      {dialogMessage && (
+        <DialogModal />
       )}
 
 

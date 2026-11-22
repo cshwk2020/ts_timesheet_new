@@ -1,20 +1,23 @@
-.day-view { text-align: left; }
+.day-view { 
+  text-align: left; 
+}
 
-/* header stays the same */
+/* Header */
 .day-view-header {
   display: flex;
-  justify-content:space-between;
+  justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.75rem;
   padding: 0.5rem 0;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid var(--border);
   width: 100%;
 }
+
 .day-view-header button {
-  border: 1px solid #ccc;
-  background: #fff;
-  color: #333;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
   border-radius: 6px;
   width: 32px;
   height: 32px;
@@ -22,76 +25,102 @@
   font-size: 1.1rem;
   line-height: 1;
 }
-.day-view-header button:hover { background: #f5f5f5; }
+
+.day-view-header button:hover { 
+  background: var(--accent-bg); 
+}
+
 .day-view-date {
   flex: 1;
   text-align: center;
   font-weight: 600;
   font-size: 0.95rem;
+  color: var(--text-h);
 }
+
 .day-view-type {
   padding: 0.4rem 0.6rem;
   border-radius: 6px;
-  border: 1px solid #333;
-  background: #333;
-  color: #EEE;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-h);
 }
 
-/* ===== the row grid: [hour][main → 1fr] ===== */
+/* ===== The row grid: [hour][main → 1fr] ===== */
 .day-view-hours {
   display: flex;
   flex-direction: column;
-  border-top: 1px solid #eee;
+  border-top: 1px solid var(--border);
 }
 
 .hour-row {
   display: grid;
-  /* 👇 max-content calculates the exact width needed for the labels */
   grid-template-columns: max-content minmax(0, 1fr);
-  border-bottom: 1px solid #333; 
+   
   min-height: 48px;
   align-items: stretch;
+
+  box-shadow: 
+    inset 2px 0 0 rgba(255, 255, 255, 0.05),  
+    inset -2px 0 0 rgba(0, 0, 0, 0.1),        
+    2px 0 5px rgba(0, 0, 0, 0.05);           
+    
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);  
+  
+  
 }
 
 .hour-label {
-  font-size: 0.75rem;
-  color: #888;
-  border-right: 1px solid #333;
-  background: #1a1a1a;
   
-  /* 👇 Change to flex-start so it aligns with the top */
   display: flex;
   align-items: flex-start; 
   justify-content: center;
-  
-  /* 👇 Adjust padding to match the top of the task chip */
-  padding-top: 8px; /* Adjust this number to perfectly align with the task-line */
-  padding-left: 16px;
-  padding-right: 16px;
-  padding-bottom: 8px;
-  
+  padding: 8px 16px;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
+
+
+  font-size: 0.75rem;
+  color: var(--text);
+  color: var(--accent);
+ 
+  
+  background: var(--code-bg); 
+  
+  box-shadow: 
+    inset 2px 0 0 rgba(255, 255, 255, 0.05),  
+    inset -2px 0 0 rgba(0, 0, 0, 0.1),        
+    2px 0 5px rgba(0, 0, 0, 0.05);           
+    
+  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);  
+
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 }
 
+
 .hour-display {
-  padding: 6px 16px; /* Increased from 4px 8px */
+  background: var(--bg); 
+  padding: 6px 16px; 
   display: flex;
   flex-direction: column;
-  gap: 6px; /* Slightly larger gap between tasks */
+  gap: 6px; 
   min-width: 0; 
   overflow-wrap: break-word;
+  
 }
+
 
 .hour-main {
   display: flex;
   flex-direction: column;
   gap: 4px;
   padding: 4px 8px;
-  min-width: 0;       /* allows children (input) to shrink instead of overflowing grid */
+  min-width: 0;       
 }
 
-/* input fills the whole main column */
+/* Input fills the whole main column */
 .hour-input {
   width: 100%;
   box-sizing: border-box;
@@ -100,96 +129,118 @@
   border: 1px solid transparent;
   border-radius: 4px;
   background: transparent;
+  color: var(--text-h);
   outline: none;
+ 
 }
 
-.hour-input:hover { background: #fafafa; border-color: #eee; }
-.hour-input:focus { background: #fff; border-color: #3461ff; }
+.hour-input:hover { 
+  background: var(--accent-bg); 
+  border-color: var(--border); 
+}
 
+.hour-input:focus { 
+  background: var(--bg); 
+  border-color: var(--accent); 
+}
 
-
-
-/* tasks already stored in that hour */
+/* Tasks already stored in that hour */
 .task-chip {
   display: flex;
   gap: 6px;
   align-items: baseline;
-  background: #eef4ff;
+  background: var(--accent-bg);
   border-radius: 4px;
   padding: 2px 6px;
   font-size: 0.85rem;
+ 
 }
+
 .task-chip-type {
   font-size: 0.7rem;
   text-transform: uppercase;
-  color: #3461ff;
+  color: var(--accent);
   font-weight: 600;
   flex-shrink: 0;
 }
 
-.task-chip-details { color: #222; word-break: break-word; }
+.task-chip-details { 
+  color: var(--text-h); 
+  word-break: break-word; 
+}
 
-
-
+/* The Task Card */
 .task-line {
   display: flex;
   gap: 8px;
-  
-  /* 👇 Change this from center to flex-start */
   align-items: flex-start; 
-  
   font-size: 0.85rem;
-  background: #eef4ff; 
-  color: #333;
-  padding: 6px 12px; 
-  border-radius: 6px;
+ 
+  
+  /* 👇 Removed background, border-radius, and heavy borders */
+  background: transparent;
+  color: var(--text-h);
+  
+  padding: 8px 0; /* Adjusted padding for a list feel */
   cursor: pointer;
   transition: background 0.2s;
+  
+  /* 👇 Just a clean bottom border */
+  border-bottom: 1px solid var(--border);
+
+
+ 
+  
 }
 
 .task-line:hover {
-  background: #dbe7ff;
+  background: var(--accent-bg);
+  padding-left: 4px; /* Small nudge effect */
+  padding-right: 4px;
+  border-radius: 4px;
+  border-bottom-color: transparent; /* Hide line on hover for clean look */
 }
 
 .task-details {
   flex: 1;
-  white-space: pre-wrap; /* Preserves your aaa \n bbb \n ccc line breaks */
+  white-space: pre-wrap; 
   word-break: break-word;
-  
-  /* 👇 Optional: Add a tiny top margin so the text baseline matches the badge text baseline perfectly */
   margin-top: 1px; 
+  
 }
 
 .task-line.continued {
   opacity: 0.7;
-  font-style: italic;
 }
 
 .task-time {
-  font-family: monospace;
-  color: #3461ff;
+  font-family: var(--mono);
+  color: var(--accent);
   font-size: 0.75rem;
   font-weight: 600;
-  white-space: nowrap; /* Prevents the time from breaking into two lines */
+  white-space: nowrap; 
 }
 
 .task-duration {
   font-size: 0.7rem;
-  background: #3461ff;
-  color: white;
+   
+  color: var(--accent);
+  border: 1px solid var(--accent-border);
   padding: 2px 6px;
   border-radius: 12px;
   font-weight: 600;
   white-space: nowrap;
-  
-  /* 👇 Prevents the badge from being squished if text wraps */
   flex-shrink: 0; 
 }
-
 
 
 /* Make the empty space visually distinct on hover */
 .empty-cell-target:hover .empty-placeholder {
   opacity: 1;
-  color: #3461ff;
+  color: var(--accent);
+}
+
+.empty-placeholder {
+  color: var(--text);
+  opacity: 0.5;
 }

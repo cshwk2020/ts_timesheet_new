@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { type RootState } from '../reducers';
-import { addTask, updateTask } from '../actions/taskActions';
+import { addTask, updateTask, deleteTask } from '../actions/taskActions';
 import { checkTaskOverlap, resolveOverlaps } from '../utils/dateUtils'; 
 import { setError } from '../actions/errorActions'; 
+import { showDialog } from '../actions/dialogActions';
 import './TaskCommandBar.css';
 import type { Task } from '../types';
+import { Trash2 } from 'lucide-react';
 
 interface TaskCommandBarProps {
   isOpen: boolean;
@@ -43,6 +45,34 @@ useEffect(() => {
     const end = new Date(start);
     end.setHours(end.getHours() + 1);
     return { start, end };
+  };
+
+  /*
+  const handleDelete = () => {
+    if (editingTask) {
+      // Optional: Add a window.confirm here if you want to be extra safe
+      dispatch(deleteTask(editingTask.id));
+      onClose();
+    }
+  };
+  */
+
+  const handleDeleteClick = () => {
+    console.log("handleDeleteClick...0...");
+    if (!editingTask) return;
+
+    console.log("handleDeleteClick...1...");
+    // 👇 Pass the actual delete logic as a callback
+    dispatch(showDialog(
+      'Delete Task?',
+      'Are you sure you want to delete this task? This action cannot be undone.',
+      'Delete',
+      () => {
+        dispatch(deleteTask(editingTask.id));
+        onClose(); // Close the Command Bar after deleting
+      }
+    ));
+    console.log("handleDeleteClick...2...");
   };
 
   const initDates = getInitialDates();
@@ -208,11 +238,17 @@ useEffect(() => {
 
       {/* 2. The actual Slide-Up Bar */}
       <div className={`command-bar-wrapper ${isOpen ? 'open' : ''}`}>
+
+        
+
+      
         <form 
           className="command-bar-content" 
           onSubmit={handleSubmit}
           onClick={(e) => e.stopPropagation()} // Stop clicks inside the form from closing it
         >
+
+            
 
 
           {/* LEFT COLUMN (Auto width based on content) */}
@@ -289,6 +325,23 @@ useEffect(() => {
 
           {/* RIGHT COLUMN (Takes all remaining space) */}
           <div className="command-right-col">
+
+           
+      
+           <div className="command-bar-header">
+            {/* 👇 Top Header (Only shows when editing) */}
+            {editingTask && (
+              
+              <button 
+                    type="button" 
+                    className="delete-icon-btn" 
+                    onClick={handleDeleteClick}
+                    title="Delete Task"
+                  >
+                  <Trash2 size={18} />
+              </button>
+            )}
+
             <textarea 
               ref={inputRef as any}
               className="task-textarea" 
@@ -296,6 +349,16 @@ useEffect(() => {
               value={details} 
               onChange={(e) => setDetails(e.target.value)} 
             />
+
+             
+
+           </div>
+             
+
+             
+
+             
+
           </div>
 
 
