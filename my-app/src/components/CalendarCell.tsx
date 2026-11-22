@@ -29,7 +29,10 @@ export const CalendarCell: React.FC<CalendarCellProps> = ({ task, cellDate, hour
     const overlapEnd = Math.min(end.getTime(), cellEnd.getTime());
 
     const minutesInCell = Math.max(0, Math.round((overlapEnd - overlapStart) / 60000));
+    const formattedMinutes = String(minutesInCell).padStart(2, '0');
 
+// In your JSX:
+<span className="task-duration">{formattedMinutes} min</span>
     
     return (
         <div 
@@ -40,7 +43,10 @@ export const CalendarCell: React.FC<CalendarCellProps> = ({ task, cellDate, hour
         }}
         >
      
-        <span className="task-duration">{minutesInCell} min</span>
+ 
+        <span className="task-duration">
+            <span>{formattedMinutes} min</span>
+        </span>
         <span className="task-details">{task.task_details}</span>
        
         </div>

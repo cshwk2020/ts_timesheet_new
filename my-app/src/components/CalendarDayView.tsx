@@ -77,10 +77,13 @@ return (
                     onClick={() => onCellClick(cellDate, hour)}
                     style={{ flex: 1, cursor: 'pointer', minHeight: '24px' }}
                   >
-                    {cellTasks.length === 0 && (
-                      <span className="empty-placeholder">Click to add task…</span>
-                    )
-                  }
+                    {cellTasks.length === 0 ? (
+                    <span className="empty-placeholder">Click to add task…</span>
+                  ) : (
+                    // If there are tasks, show a subtle "+" to indicate you can add more
+                    <span className="empty-placeholder-add">+</span>
+                  )}
+               
                   </div>
 
                 </div>
