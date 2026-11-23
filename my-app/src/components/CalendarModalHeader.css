@@ -1,0 +1,76 @@
+
+/* =========================================
+   STICKY TOP HEADER
+   ========================================= */
+
+/* Wrap your toggle in this class in the JSX */
+.sticky-top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 50; /* Higher than the grid so it covers it */
+  
+  /* Add background and padding so items don't peek through when scrolling */
+  background: var(--bg);
+  padding: 12px 0;
+  margin-bottom: 8px;
+  
+  /* Subtle bottom border to separate it from the grid */
+  border-bottom: 1px solid var(--border);
+  
+  /* Flex to center the toggle */
+  display: flex;
+  justify-content: center;
+}
+
+/* =========================================
+   PREMIUM SEGMENTED TOGGLE
+   ========================================= */
+.switch-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  
+  /* Use the code-bg variable for the "track" */
+  background: var(--code-bg); 
+  padding: 4px;
+  border-radius: 10px;
+  
+  /* Subtle inset shadow to make it look like a groove */
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.switch-toggle-btn {
+  border: none;
+  background: transparent;
+  padding: 6px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+  
+  /* Smooth transition for the switch */
+  transition: all 0.2s ease;
+}
+
+.switch-toggle-btn:hover {
+  color: var(--text-h);
+}
+
+/* The Active State (The "Thumb" of the switch) */
+.switch-toggle-btn.active {
+  /* Use the main bg color to make it "pop" out of the track */
+  background: var(--bg); 
+  color: var(--accent); /* Use your accent color for the text */
+  font-weight: 600;
+  
+  /* Drop shadow to make the active button look raised */
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15), 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Dark mode tweak for the active button shadow */
+@media (prefers-color-scheme: dark) {
+  .switch-toggle-btn.active {
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  }
+}

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import CalendarDayView from './CalendarDayView';
 import { TaskCommandBar } from './TaskCommandBar';
 import { clearError } from '../actions/errorActions';
 import type { Task } from '../types';
@@ -7,12 +6,19 @@ import type { RootState } from '../reducers';
 import { useDispatch, useSelector } from 'react-redux';
 import { ErrorModal } from './ErrorModal';
 import { DialogModal } from './DialogModal';
+import CalendarDayView from './CalendarDayView';
+import CalendarWeekView from './CalendarWeekView';
+import CalendarMonthView from './CalendarMonthView';
+import CalendarYearView from './CalendarYearView';
+import './CalendarModalHeader.css';
+
 
 const CalendarMain: React.FC = () => {
 
   const dispatch = useDispatch();
   
   const [currentView, setCurrentView] = useState<'day' | 'week' | 'month'>('day');
+  
   
   // Bar State
   const [isBarOpen, setIsBarOpen] = useState(false);
@@ -64,11 +70,20 @@ const CalendarMain: React.FC = () => {
 
   return (
     <div className="calendar-main">
+      
       {/* View Toggle */}
-      <div className="switch-toggle" style={{ marginBottom: '20px' }}>
-        <button onClick={() => setCurrentView('day')} className={currentView === 'day' ? 'active' : ''}>Day</button>
-        <button onClick={() => setCurrentView('week')} className={currentView === 'week' ? 'active' : ''}>Week</button>
-        <button onClick={() => setCurrentView('month')} className={currentView === 'month' ? 'active' : ''}>Month</button>
+       <div className="sticky-top-bar">
+        <div className="switch-toggle">
+          {['day', 'week', 'month'].map((view) => (
+            <button
+              key={view}
+              onClick={() => setCurrentView(view as any)}
+              className={`switch-toggle-btn ${currentView === view ? 'active' : ''}`}
+            >
+              {view.charAt(0).toUpperCase() + view.slice(1)}
+            </button>
+          ))}
+        </div>
       </div>
 
  
@@ -88,10 +103,35 @@ const CalendarMain: React.FC = () => {
 
       {/* Grid (Click to open bar) */}
       <div className="view-container" style={{ paddingBottom: '100px' }}>
+        
         {currentView === 'day' && <CalendarDayView 
           onCellClick={handleCellClick} 
           onTaskClick={handleTaskClick} 
         />}
+
+        {currentView === 'week' && (
+          <CalendarWeekView 
+            onCellClick={handleCellClick} 
+            onTaskClick={handleTaskClick} 
+          />
+        )}
+
+        {currentView === 'month' && (
+          <CalendarMonthView 
+            onCellClick={handleCellClick} 
+            onTaskClick={handleTaskClick} 
+          />
+        )}
+
+        {/*}
+        {currentView === 'year' && (
+          <CalendarYearView 
+            onCellClick={handleCellClick} 
+            onTaskClick={handleTaskClick} 
+          />
+        )}
+          */}
+
       </div>
 
       {/* Slide up Bar */}

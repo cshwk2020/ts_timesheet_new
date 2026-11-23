@@ -1,52 +1,19 @@
+/* =========================================
+   MAIN CONTAINER
+   ========================================= */
 .day-view { 
   text-align: left; 
 }
 
-/* Header */
-.day-view-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.75rem;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid var(--border);
-  width: 100%;
-}
+/* 
+  👇 Note: The header styles (.day-view-header, .day-header-left, .nav-btn-left, etc.) 
+  have been completely removed from this file. 
+  They now live in calendar_header_nav.css.
+*/
 
-.day-view-header button {
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--text);
-  border-radius: 6px;
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  font-size: 1.1rem;
-  line-height: 1;
-}
-
-.day-view-header button:hover { 
-  background: var(--accent-bg); 
-}
-
-.day-view-date {
-  flex: 1;
-  text-align: center;
-  font-weight: 600;
-  font-size: 0.95rem;
-  color: var(--text-h);
-}
-
-.day-view-type {
-  padding: 0.4rem 0.6rem;
-  border-radius: 6px;
-  border: 1px solid var(--border);
-  background: var(--bg);
-  color: var(--text-h);
-}
-
-/* ===== The row grid: [hour][main → 1fr] ===== */
+/* =========================================
+   THE GRID (24 Hours)
+   ========================================= */
 .day-view-hours {
   display: flex;
   flex-direction: column;
@@ -56,51 +23,41 @@
 .hour-row {
   display: grid;
   grid-template-columns: max-content minmax(0, 1fr);
-   
   min-height: 48px;
   align-items: stretch;
-
+  border-bottom: 1px solid var(--border);
+  
+  /* Subtle shadow for the row */
   box-shadow: 
     inset 2px 0 0 rgba(255, 255, 255, 0.05),  
     inset -2px 0 0 rgba(0, 0, 0, 0.1),        
     2px 0 5px rgba(0, 0, 0, 0.05);           
-    
-  border-right: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);  
-  
-  
 }
 
+/* Column 1: Time Range */
 .hour-label {
-  
   display: flex;
   align-items: flex-start; 
   justify-content: center;
   padding: 8px 16px;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
-
-
   font-size: 0.75rem;
-  font-weight: bold;
-  color: var(--text);
+
   color: var(--accent);
- 
-  
   background: var(--code-bg); 
   
+  /* 3D Bevel effect */
   box-shadow: 
     inset 2px 0 0 rgba(255, 255, 255, 0.05),  
     inset -2px 0 0 rgba(0, 0, 0, 0.1),        
     2px 0 5px rgba(0, 0, 0, 0.05);           
     
   border-right: 1px solid var(--border);
-  border-bottom: 1px solid var(--border);  
-
   text-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
 }
 
-
+/* Column 2: Tasks and Add Button */
 .hour-display {
   background: var(--bg); 
   padding: 6px 16px; 
@@ -111,94 +68,37 @@
   overflow-wrap: break-word;  
 }
 
-
-.hour-main {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 4px 8px;
-  min-width: 0;       
-}
-
-/* Input fills the whole main column */
-.hour-input {
-  width: 100%;
-  box-sizing: border-box;
-  padding: 6px 8px;
-  font-size: 0.85rem;
-  border: 1px solid transparent;
-  border-radius: 4px;
-  background: transparent;
-  color: var(--text-h);
-  outline: none;
- 
-}
-
-.hour-input:hover { 
-  background: var(--accent-bg); 
-  border-color: var(--border); 
-}
-
-.hour-input:focus { 
-  background: var(--bg); 
-  border-color: var(--accent); 
-}
-
-/* Tasks already stored in that hour */
-.task-chip {
-  display: flex;
-  gap: 6px;
-  align-items: baseline;
-  background: var(--accent-bg);
-  border-radius: 4px;
-  padding: 2px 6px;
-  font-size: 0.85rem;
- 
-}
-
-.task-chip-type {
-  font-size: 0.7rem;
-  text-transform: uppercase;
-  color: var(--accent);
-  font-weight: 600;
-  flex-shrink: 0;
-}
-
-.task-chip-details { 
-  color: var(--text-h); 
-  word-break: break-word; 
-}
-
-/* The Task Card */
+/* =========================================
+   TASK STYLING
+   ========================================= */
 .task-line {
   display: flex;
   gap: 8px;
   align-items: flex-start; 
   font-size: 0.85rem;
- 
-  
-  /* 👇 Removed background, border-radius, and heavy borders */
   background: transparent;
   color: var(--text-h);
-  
-  padding: 8px 0; /* Adjusted padding for a list feel */
+  padding: 8px 0; 
   cursor: pointer;
-  transition: background 0.2s;
-  
-  /* 👇 Just a clean bottom border */
+  transition: background 0.2s, padding 0.2s;
   border-bottom: 1px solid var(--border);
 }
 
+/* Remove bottom border if it's the last task before the empty space */
 .task-line:has(+ .empty-cell-target) {
   border-bottom: none;
 }
 
 .task-line:hover {
   background: var(--accent-bg);
-  padding-left: 4px; /* Small nudge effect */
+  padding-left: 4px; 
   padding-right: 4px;
   border-radius: 4px;
-  border-bottom-color: transparent; /* Hide line on hover for clean look */
+  border-bottom-color: transparent; 
+}
+
+.task-line.continued {
+  opacity: 0.7;
 }
 
 .task-details {
@@ -206,11 +106,6 @@
   white-space: pre-wrap; 
   word-break: break-word;
   margin-top: 1px; 
-  
-}
-
-.task-line.continued {
-  opacity: 0.7;
 }
 
 .task-time {
@@ -221,9 +116,7 @@
   white-space: nowrap; 
 }
 
-
 .task-duration {
-  /* Keep your existing colors and borders */
   font-size: 0.7rem;
   background: var(--accent-bg);
   color: var(--accent);
@@ -232,46 +125,34 @@
   border-radius: 12px;
   font-weight: 600;
   white-space: nowrap;
-  
-  /* 👇 1. Make it a Grid container */
   display: grid;
   grid-template-columns: 1fr;
   text-align: center;
-
-  /* 👇 2. Let it grow! (Remove flex-shrink: 0) */
-  /* flex-shrink: 0; <- REMOVE THIS */
 }
 
-
-
-
-
-/* The empty space container */
+/* =========================================
+   EMPTY SPACE / ADD TARGET
+   ========================================= */
 .empty-cell-target {
   flex: 1; 
-  min-height: 28px; /* Give it a bit more height to breathe */
+  min-height: 28px; 
   cursor: pointer;
   display: flex;
-  
-  /* 👇 Center the content horizontally and vertically */
-  align-items: start;
+  align-items: center; 
   justify-content: center; 
-  
   border-radius: 10px;
   transition: background 0.15s ease, border-color 0.15s ease;
   border: 1px dashed transparent; 
 }
 
-/* 👇 1. Hover state for the empty space */
 .empty-cell-target:hover {
   background: var(--accent-bg); 
   border-color: var(--accent-border); 
 }
 
-/* Default text when cell is completely empty */
 .empty-placeholder {
   color: var(--text);
-  opacity: 0.3;
+  opacity: 0.4;
   font-size: 0.85rem;
   font-style: italic;
   transition: opacity 0.15s ease;
@@ -282,28 +163,16 @@
   color: var(--accent);
 }
 
-/* 👇 2. The centered gray "+" sign */
 .empty-placeholder-add {
-  /* Use standard text color for gray, or hardcode #888 for true gray */
   color: var(--text); 
-  opacity: 0.3; /* Keep it subtle when not hovered */
-  
-  font-size: 1.5rem; /* Make it slightly larger */
-  font-weight: 300;  /* Thin it out so it looks elegant */
-  line-height: 1;    /* Prevent it from pushing the cell height */
-  
+  opacity: 0.3; 
+  font-size: 1.5rem; 
+  font-weight: 300;  
+  line-height: 1;    
   transition: opacity 0.15s ease, color 0.15s ease;
 }
 
-/* Brighten the + slightly on hover */
 .empty-cell-target:hover .empty-placeholder-add {
   opacity: 0.8; 
-  color: var(--text-h); /* Darker/lighter based on theme */
-}
-
- 
-
-.empty-placeholder {
-  color: var(--text);
-  opacity: 0.5;
+  color: var(--text-h); 
 }

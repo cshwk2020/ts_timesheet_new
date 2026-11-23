@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '../reducers';
 import { CalendarCell } from './CalendarCell';
+import './CalendarNavHeader.css';
 import './CalendarDayView.css';
 import type { Task } from '../types';
 
@@ -13,11 +14,13 @@ interface Props {
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 
 const CalendarDayView: React.FC<Props> = ({ onCellClick, onTaskClick }) => {
+
   const tasks = useSelector((state: RootState) => state.tasks.tasks);
   
-  // 
+  // State to track the currently viewed date
   const [selectedDate, setSelectedDate] = useState<Date>(() => new Date());
 
+  // Navigation handlers
   const goPrevDay = () => {
     const d = new Date(selectedDate);
     d.setDate(d.getDate() - 1);
@@ -30,20 +33,43 @@ const CalendarDayView: React.FC<Props> = ({ onCellClick, onTaskClick }) => {
     setSelectedDate(d);
   };
 
-  //  
   const getTasksForHour = (date: Date, hour: number) => {
     const cellStart = new Date(date);
     cellStart.setHours(hour, 0, 0, 0);
     const cellEnd = new Date(date);
-    cellEnd.setHours(hour + 1, 0, 0, 0);  
+    cellEnd.setHours(hour + 1, 0, 0, 0); 
 
     return tasks.filter((t) => {
       return t.from_timestamp < cellEnd.getTime() && t.to_timestamp > cellStart.getTime();
     });
   };
 
+
+
+
 return (
     <div className="day-view">
+
+
+      {/* 👇 NEW HEADER WITH NAVIGATION */}
+      <div className="calendar-header-nav">
+        <button className="nav-btn-left" onClick={goPrevDay} aria-label="Previous day">
+          <span>‹</span>
+        </button>
+        
+        <span className="nav-date-display">
+          {selectedDate.toLocaleDateString(undefined, { 
+            weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' 
+          })}
+        </span>
+        
+        <button className="nav-btn-right" onClick={goNextDay} aria-label="Next day">
+          <span>›</span>
+        </button>
+      </div>
+
+
+
       <div className="day-view-hours">
         {HOURS.map((hour) => {
           const cellTasks = getTasksForHour(selectedDate, hour);
