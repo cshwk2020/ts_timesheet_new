@@ -16,9 +16,10 @@ const HOURS = Array.from({ length: 24 }, (_, i) => i);
 const CalendarWeekView: React.FC<Props> = ({ onCellClick, onTaskClick }) => {
   const tasks = useSelector((state: RootState) => state.tasks.tasks);
   
-  // We use this to navigate weeks, but default to the current week
-  const [currentDate, setCurrentDate] = useState<Date>(() => new Date());
-
+  // Inside the component:
+  const currentDateStr = useSelector((state: RootState) => state.calendar.currentDate);
+  const currentDate = new Date(currentDateStr);
+ 
   // Calculate the 7 days of the current week (Sunday to Saturday)
   const weekDays = useMemo(() => {
     const days = [];
@@ -35,17 +36,7 @@ const CalendarWeekView: React.FC<Props> = ({ onCellClick, onTaskClick }) => {
     return days;
   }, [currentDate]);
 
-  // Navigate weeks
-  const goPrevWeek = () => {
-    const d = new Date(currentDate);
-    d.setDate(d.getDate() - 7);
-    setCurrentDate(d);
-  };
-  const goNextWeek = () => {
-    const d = new Date(currentDate);
-    d.setDate(d.getDate() + 7);
-    setCurrentDate(d);
-  };
+   
 
   // Helper to find tasks for a specific cell (day + hour)
   const getTasksForCell = (day: Date, hour: number) => {
@@ -61,22 +52,6 @@ const CalendarWeekView: React.FC<Props> = ({ onCellClick, onTaskClick }) => {
 
   return (
     <div className="week-view">
-
-      {/* Header: Navigation + Days */}
-      <div className="calendar-header-nav">
-        <button className="nav-btn-left" onClick={goPrevWeek} aria-label="Previous week">
-          <span>‹</span>
-        </button>
-        
-        <span className="nav-date-display">
-          {weekDays[0].toLocaleDateString(undefined, { month: 'short', day: 'numeric' })} - 
-          {weekDays[6].toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-        </span>
-        
-        <button className="nav-btn-right" onClick={goNextWeek} aria-label="Next week">
-          <span>›</span>
-        </button>
-      </div>
 
       {/* The Grid */}
       <div className="week-grid-body">

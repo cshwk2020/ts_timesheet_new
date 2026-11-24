@@ -160,39 +160,7 @@
   color: var(--text-h);
 }
 
-/* 👇 Date Badge using Accent Colors */
-.date-badge {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 8px 10px;
-  background: var(--accent-bg);
-  border-radius: 6px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--accent);
-  cursor: pointer;
-  user-select: none;
-  transition: background 0.2s;
-  height: 38px;
-  box-sizing: border-box;
-  border: 1px solid var(--accent-border);
-}
-
-.date-badge:hover {
-  background: var(--accent-border);
-}
-
-.date-badge input[type="date"] {
-  border: none;
-  background: transparent;
-  font-family: inherit;
-  font-size: 0.85rem;
-  color: var(--accent);
-  font-weight: 600;
-  outline: none;
-  width: 110px;
-}
+ 
 
 .time-arrow {
   font-size: 1.2rem;

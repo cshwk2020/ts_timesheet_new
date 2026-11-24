@@ -1,0 +1,109 @@
+.calendar-header-nav {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  position: sticky;
+  top: 56px; 
+  z-index: 9;
+  padding: 0;
+  height: 56px; /* Fixed height for consistency */
+}
+
+/* 👇 1. Arrow Buttons: Take up all remaining space */
+.nav-btn-left,
+.nav-btn-right {
+  flex: 1; /* 👈 This is crucial! They act as spacers. */
+  height: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  cursor: pointer;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  transition: background 0.2s, color 0.2s;
+}
+
+.nav-btn-left {
+  justify-content: flex-start;
+  padding-left: 24px;
+}
+
+.nav-btn-right {
+  justify-content: flex-end;
+  padding-right: 24px;
+}
+
+.nav-btn-left:hover,
+.nav-btn-right:hover {
+  background: var(--accent-bg);
+  color: var(--accent);
+}
+
+/* 👇 2. The Date Container: Only as wide as the pill */
+.nav-date-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* 👇 NO flex: 1. Let it shrink-wrap its content */
+  flex: 0 0 auto; 
+  position: relative;
+  height: 100%;
+
+ 
+}
+
+/* 👇 3. The Clickable Pill */
+.date-jump-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  padding: 6px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+ 
+}
+
+/* 👇 4. Hover state ONLY on the pill */
+.nav-date-display:hover {
+  background: var(--accent-bg);
+  border-color: var(--accent-border);
+}
+
+.header-plain-text {
+  font-weight: 600;
+  color: var(--text-h);
+  font-size: 0.95rem;
+}
+
+.jump-icon {
+  color: var(--text);
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+.date-jump-pill:hover .jump-icon {
+  color: var(--accent);
+  opacity: 1;
+}
+
+/* 👇 5. The Hidden Input */
+.hidden-date-input {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none; 
+   
+  border: 10px solid red;
+}

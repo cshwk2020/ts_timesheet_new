@@ -17,16 +17,7 @@
 /* =========================================
    THE 7 DAY HEADERS (Sunday to Saturday)
    ========================================= */
-.week-header-days {
-  display: grid;
-  /* 1 Time Column (120px) + 7 Equal Day Columns */
-  grid-template-columns: 120px repeat(7, 1fr);
-  border-bottom: 1px solid var(--border);
-  background: var(--bg);
-  position: sticky;
-  top: 0; /* Keeps the days visible when scrolling down */
-  z-index: 10;
-}
+ 
 
 .week-day-label {
   text-align: center;

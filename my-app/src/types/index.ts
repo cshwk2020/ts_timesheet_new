@@ -1,5 +1,18 @@
 // src/types/index.ts
 
+
+export interface CalendarState {
+  currentDate: string; // Store as ISO string in Redux
+}
+
+export const SET_CURRENT_DATE = 'SET_CURRENT_DATE';
+
+interface SetCurrentDateAction {
+  type: typeof SET_CURRENT_DATE;
+  payload: string; // ISO string
+}
+
+
 /**
  * A task type as it will exist in the DB.
  * - `id` is the PK (could be uuid, int, slug — keep as string for flexibility)
@@ -118,4 +131,4 @@ interface HideDialogAction {
 
 // ALL Actions
 
-export type AppActionTypes = TaskActionTypes | SetErrorAction | ClearErrorAction | ShowDialogAction | HideDialogAction;;
+export type AppActionTypes = TaskActionTypes | SetErrorAction | ClearErrorAction | ShowDialogAction | HideDialogAction | SetCurrentDateAction;

@@ -5,6 +5,8 @@ import { addTask, updateTask, deleteTask } from '../actions/taskActions';
 import { checkTaskOverlap, resolveOverlaps } from '../utils/dateUtils'; 
 import { setError } from '../actions/errorActions'; 
 import { showDialog } from '../actions/dialogActions';
+import { LockedDate } from './LockedDate'; // 👈 Import it
+import './LockedDate.css'; 
 import './TaskCommandBar.css';
 import type { Task } from '../types';
 import { Trash2 } from 'lucide-react';
@@ -260,14 +262,11 @@ useEffect(() => {
                 <div className="time-inputs">
                   <input type="time" value={toTimeStr(startDateTime)} onChange={(e) => handleStartTimeChange(e.target.value)} required />
                   <div className={`date-badge ${isDateEditable ? 'editable' : ''}`} onClick={() => setIsDateEditable(!isDateEditable)}>
-                    {isDateEditable ? (
-                      <input type="date" value={toDateStr(startDateTime)} onChange={(e) => {
-                          if(!e.target.value) return;
-                          setStartDateTime(new Date(`${e.target.value}T${toTimeStr(startDateTime)}:00`));
-                      }} autoFocus onBlur={() => setIsDateEditable(false)} />
-                    ) : (
-                      <span>{toDateStr(startDateTime).slice(5).replace('-', '/')} 🔒</span>
-                    )}
+                     
+                    <LockedDate 
+                      date={startDateTime} 
+                      onChange={(newDate) => setStartDateTime(newDate)} 
+                    />
                   </div>
                 </div>
               </div>
@@ -279,14 +278,12 @@ useEffect(() => {
                 <div className="time-inputs">
                   <input type="time" value={toTimeStr(endDateTime)} onChange={(e) => handleEndTimeChange(e.target.value)} required />
                   <div className={`date-badge ${isDateEditable ? 'editable' : ''}`} onClick={() => setIsDateEditable(!isDateEditable)}>
-                    {isDateEditable ? (
-                      <input type="date" value={toDateStr(endDateTime)} onChange={(e) => {
-                          if(!e.target.value) return;
-                          setEndDateTime(new Date(`${e.target.value}T${toTimeStr(endDateTime)}:00`));
-                      }} onBlur={() => setIsDateEditable(false)} />
-                    ) : (
-                      <span>{toDateStr(endDateTime).slice(5).replace('-', '/')} 🔒</span>
-                    )}
+                   
+                    <LockedDate 
+                      date={endDateTime} 
+                      onChange={(newDate) => setEndDateTime(newDate)} 
+                    />
+
                   </div>
                 </div>
               </div>

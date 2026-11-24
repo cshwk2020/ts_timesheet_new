@@ -10,6 +10,9 @@ import CalendarDayView from './CalendarDayView';
 import CalendarWeekView from './CalendarWeekView';
 import CalendarMonthView from './CalendarMonthView';
 import CalendarYearView from './CalendarYearView';
+import { setCurrentDate } from '../actions/calendarActions';
+import { CalendarNavigator } from './CalendarNavigator';
+
 import './CalendarModalHeader.css';
 
 
@@ -19,6 +22,10 @@ const CalendarMain: React.FC = () => {
   
   const [currentView, setCurrentView] = useState<'day' | 'week' | 'month'>('day');
   
+  // Grab the currentDate from Redux
+  const currentDateStr = useSelector((state: RootState) => state.calendar.currentDate);
+  const currentDate = new Date(currentDateStr);
+
   
   // Bar State
   const [isBarOpen, setIsBarOpen] = useState(false);
@@ -57,6 +64,41 @@ const CalendarMain: React.FC = () => {
     setIsBarOpen(false);
   };
 
+  const handleNavigate = (direction: 'prev' | 'next') => {
+    const d = new Date(currentDate);
+    const multiplier = direction === 'next' ? 1 : -1;
+
+    if (currentView === 'day') {
+      d.setDate(d.getDate() + multiplier);
+    } 
+    else if (currentView === 'week') {
+      d.setDate(d.getDate() + (7 * multiplier));
+    } 
+    else if (currentView === 'month') {
+      // 👇 The "No-Drift" Month Logic
+      // 1. Save the original day (e.g., 31)
+      const originalDay = d.getDate();
+      
+      // 2. Move to the 1st of the month to prevent JS rollover
+      d.setDate(1);
+      d.setMonth(d.getMonth() + multiplier);
+      
+      // 3. Try to restore the original day, but clamp it if the new month is shorter
+      const lastDayOfNewMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+      d.setDate(Math.min(originalDay, lastDayOfNewMonth));
+    }
+
+    dispatch(setCurrentDate(d));
+  };
+
+  // 👇 Direct date jump (from a date picker or text input)
+  const handleDateJump = (date: Date) => {
+    dispatch(setCurrentDate(date));
+  };
+
+
+
+
   /*
   useEffect(() => {
     if (errorMessage) {
@@ -86,7 +128,10 @@ const CalendarMain: React.FC = () => {
         </div>
       </div>
 
- 
+      {/* 👇 The isolated Navigator handles all headers */}
+      <CalendarNavigator viewMode={currentView} />
+
+  
 
       {errorMessage && (
         <ErrorModal 

@@ -13,18 +13,9 @@ interface Props {
 
 const CalendarMonthView: React.FC<Props> = ({ onCellClick, onTaskClick }) => {
   const tasks = useSelector((state: RootState) => state.tasks.tasks);
-  const [currentDate, setCurrentDate] = useState<Date>(() => new Date());
 
-  const goPrevMonth = () => {
-    const d = new Date(currentDate);
-    d.setMonth(d.getMonth() - 1);
-    setCurrentDate(d);
-  };
-  const goNextMonth = () => {
-    const d = new Date(currentDate);
-    d.setMonth(d.getMonth() + 1);
-    setCurrentDate(d);
-  };
+  const currentDateStr = useSelector((state: RootState) => state.calendar.currentDate);
+  const currentDate = new Date(currentDateStr);
 
   // Generate the 42 days
     const { calendarDays, rowCount } = useMemo(() => {
@@ -80,11 +71,7 @@ const CalendarMonthView: React.FC<Props> = ({ onCellClick, onTaskClick }) => {
 
   return (
     <div className="month-view">
-      <div className="calendar-header-nav">
-        <button className="nav-btn-left" onClick={goPrevMonth}>‹</button>
-        <span className="nav-date-display">{monthName}</span>
-        <button className="nav-btn-right" onClick={goNextMonth}>›</button>
-      </div>
+       
 
       <div className="month-days-header">
         {weekDays.map((day) => (

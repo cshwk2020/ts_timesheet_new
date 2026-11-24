@@ -1,0 +1,85 @@
+/* Container */
+.locked-date-wrapper {
+  display: inline-flex;
+  position: relative;
+  height: 38px; /* Match time input height */
+}
+
+/* Locked State */
+.locked-date-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  background: var(--accent-bg);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--accent);
+  cursor: pointer;
+  border: 1px solid var(--accent-border);
+  user-select: none;
+  transition: background 0.2s;
+  height: 100%;
+}
+
+.locked-date-display:hover {
+  background: var(--accent-border);
+}
+
+.calendar-icon, .lock-icon {
+  opacity: 0.8;
+}
+
+/* 👇 Editing State Container */
+.locked-date-editing-container {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  border: 1px solid var(--accent);
+  background: var(--bg);
+  border-radius: 6px;
+  overflow: hidden; /* Keeps the button flush inside */
+  width: 140px;
+}
+
+/* 👇 Custom Button on the Left */
+.custom-calendar-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 0 8px;
+  background: var(--accent-bg);
+  border: none;
+  border-right: 1px solid var(--accent-border);
+  color: var(--accent);
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.custom-calendar-btn:hover {
+  background: var(--accent-border);
+}
+
+/* 👇 The Input Field */
+.locked-date-input {
+  flex: 1;
+  border: none; /* Remove border, the container has it */
+  background: transparent;
+  color: var(--text-h);
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  outline: none;
+  padding: 0 4px;
+  height: 100%;
+  cursor: text;
+  min-width: 0; /* Allows input to shrink */
+}
+
+/* 👇 HIDE the native browser calendar icon so only OUR custom one shows */
+.locked-date-input::-webkit-calendar-picker-indicator {
+  display: none !important;
+  -webkit-appearance: none;
+}
