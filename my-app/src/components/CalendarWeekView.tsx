@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import { type RootState } from '../reducers';
-import { CalendarCell } from './CalendarCell';
+import { CalendarWeekCell } from './CalendarWeekCell';
 import type { Task } from '../types';
 import './CalendarNavHeader.css';
 import './CalendarWeekView.css';
@@ -77,13 +77,14 @@ const CalendarWeekView: React.FC<Props> = ({ onCellClick, onTaskClick }) => {
                   onClick={() => onCellClick(cellDate, hour)}
                 >
                   {cellTasks.map((t) => (
-                    <CalendarCell 
+                    <CalendarWeekCell 
                       key={t.id} 
                       task={t} 
                       cellDate={cellDate} 
                       hour={hour} 
                       onTaskClick={onTaskClick} 
                     />
+
                   ))}
                   
                   {/* Only show the "+" target if there's space */}

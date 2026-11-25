@@ -106,6 +106,7 @@
   color: var(--text);
   pointer-events: none; /* So it doesn't block drag */
   z-index: 2;
+  
 }
 
 
@@ -123,6 +124,7 @@
   flex-direction: column;
   gap: 2px;
   overflow: hidden;
+ 
 }
 
 .month-cell-tasks .task-line {

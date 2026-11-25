@@ -1,0 +1,143 @@
+
+.modal-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.type-manager-modal {
+  background: var(--bg);
+  width: 100%;
+  max-width: 450px;
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-header h2 {
+  font-size: 1.1rem;
+  margin: 0;
+  color: var(--text-h);
+}
+
+.type-list {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.type-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--code-bg);
+}
+
+.color-indicator {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.view-mode, .edit-mode {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1;
+}
+
+.view-mode span {
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+.edit-trigger {
+  background: transparent;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.edit-mode input {
+  flex: 1;
+  padding: 4px 8px;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.save-btn, .cancel-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--text);
+}
+
+.save-btn { color: #10b981; } /* Green */
+.cancel-btn { color: #ef4444; } /* Red */
+
+.add-type-form {
+  display: flex;
+  gap: 8px;
+  padding: 16px;
+  border-top: 1px solid var(--border);
+  background: var(--code-bg);
+  border-radius: 0 0 12px 12px;
+}
+
+.add-type-form input[type="color"] {
+  padding: 0;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  cursor: pointer;
+  background: transparent;
+}
+
+.add-type-form input[type="text"] {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.add-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  padding: 0 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}

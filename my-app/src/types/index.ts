@@ -1,16 +1,49 @@
 // src/types/index.ts
 
+ 
 
 export interface CalendarState {
-  currentDate: string; // Store as ISO string in Redux
+  currentDate: string;  
+  viewMode: 'day' | 'week' | 'month';  
+  isTaskTypeManagerOpen: boolean;     
 }
 
 export const SET_CURRENT_DATE = 'SET_CURRENT_DATE';
+export const SET_VIEW_MODE = 'SET_VIEW_MODE';
+export const TOGGLE_TASK_TYPE_MANAGER = 'TOGGLE_TASK_TYPE_MANAGER';
+
+ 
 
 interface SetCurrentDateAction {
   type: typeof SET_CURRENT_DATE;
   payload: string; // ISO string
 }
+
+interface SetViewModeAction {
+  type: typeof SET_VIEW_MODE;
+  payload: 'day' | 'week' | 'month';
+}
+
+interface ToggleTaskTypeManagerAction {
+  type: typeof TOGGLE_TASK_TYPE_MANAGER;
+  payload: boolean;
+}
+ 
+
+
+
+ 
+
+ 
+// Action Types
+export const ADD_TASK = 'ADD_TASK';
+export const SET_TASK_TYPES = 'SET_TASK_TYPES';   // 👈 new: hydrate types from DB
+export const UPDATE_TASK = 'UPDATE_TASK';
+export const DELETE_TASK = 'DELETE_TASK';
+export const ADD_TASK_TYPE = 'ADD_TASK_TYPE';
+export const UPDATE_TASK_TYPE = 'UPDATE_TASK_TYPE';
+export const TOGGLE_TASK_STATUS = 'TOGGLE_TASK_STATUS';
+ 
 
 
 /**
@@ -21,6 +54,7 @@ interface SetCurrentDateAction {
 export interface TaskType {
   id: string;
   name: string;
+  color?: string;
 }
 
 /**
@@ -37,24 +71,24 @@ export interface Task {
   to_timestamp: number;   // 👈 Fast checking
   task_details: string;
   task_type_id: string;
+  status: 'planned' | 'done';
 }
 
 
 // 
-
 export interface TaskState {
   tasks: Task[];
   taskTypes: TaskType[];     // 👈 also keep the list in Redux
 }
 
-// Action Types
-export const ADD_TASK = 'ADD_TASK';
-export const SET_TASK_TYPES = 'SET_TASK_TYPES';   // 👈 new: hydrate types from DB
-export const UPDATE_TASK = 'UPDATE_TASK';
-export const DELETE_TASK = 'DELETE_TASK';
+//
+export interface ToggleTaskStatusAction {
+  type: typeof TOGGLE_TASK_STATUS;
+  payload: string; // Task ID
+}
 
- 
- 
+
+
 
 // Action Interfaces
 export interface AddTaskAction {
@@ -78,8 +112,19 @@ interface DeleteTaskAction {
   payload: string; // The task ID
 }
 
+interface AddTaskTypeAction {
+  type: typeof ADD_TASK_TYPE;
+  payload: TaskType;
+}
+
+interface UpdateTaskTypeAction {
+  type: typeof UPDATE_TASK_TYPE;
+  payload: TaskType;
+}
+
 //
-export type TaskActionTypes = AddTaskAction | SetTaskTypesAction | UpdateTaskAction | DeleteTaskAction;
+export type TaskActionTypes = AddTaskAction | SetTaskTypesAction | UpdateTaskAction | DeleteTaskAction | AddTaskTypeAction | UpdateTaskTypeAction | ToggleTaskStatusAction;
+
 
 
 
@@ -131,4 +176,18 @@ interface HideDialogAction {
 
 // ALL Actions
 
-export type AppActionTypes = TaskActionTypes | SetErrorAction | ClearErrorAction | ShowDialogAction | HideDialogAction | SetCurrentDateAction;
+export type AppActionTypes = TaskActionTypes 
+  | SetErrorAction 
+  | ClearErrorAction 
+  | ShowDialogAction 
+  | HideDialogAction 
+  | SetCurrentDateAction 
+  | SetViewModeAction 
+  | ToggleTaskTypeManagerAction 
+  | SetCurrentDateAction
+  | ToggleTaskTypeManagerAction;
+
+
+
+
+ 

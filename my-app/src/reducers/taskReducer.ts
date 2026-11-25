@@ -6,6 +6,9 @@ import {
   SET_TASK_TYPES,
   UPDATE_TASK,
   DELETE_TASK,
+  ADD_TASK_TYPE, 
+  UPDATE_TASK_TYPE,
+  TOGGLE_TASK_STATUS 
 } from '../types';
 
 const initialState: TaskState = {
@@ -45,6 +48,38 @@ const taskReducer = (
           ...state,
           taskTypes: action.payload,
         };
+
+    case ADD_TASK_TYPE:
+      return {
+        ...state,
+        taskTypes: [...state.taskTypes, action.payload],
+      };
+
+    case UPDATE_TASK_TYPE:
+      return {
+        ...state,
+        taskTypes: state.taskTypes.map((t) => 
+          t.id === action.payload.id ? action.payload : t
+        ),
+      };
+
+     case TOGGLE_TASK_STATUS:
+      console.log('TOGGLE_TASK_STATUS...0...');
+        return {
+          ...state,
+          tasks: state.tasks.map((t) => {
+            if (t.id === action.payload) {
+              // 👇 MUST create a new object reference
+              return {
+                ...t,
+                status: t.status === 'done' ? 'planned' : 'done',
+              };
+            }
+            console.log('TOGGLE_TASK_STATUS...1...');
+            return t;
+          }),
+        };
+ 
  
     default:
       return state;

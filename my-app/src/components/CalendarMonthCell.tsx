@@ -60,8 +60,9 @@ export const CalendarMonthCell: React.FC<Props> = ({
       </div>
 
       {/* Date Number */}
+     
       <div className="month-date-number">
-        {date.getDate()}
+         <span>{date.getDate()}</span>
         {date.getDate() === 1 && (
           <span className="month-name-label">
             {date.toLocaleDateString(undefined, { month: 'short' })}

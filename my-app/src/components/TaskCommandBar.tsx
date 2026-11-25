@@ -2,14 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { type RootState } from '../reducers';
 import { addTask, updateTask, deleteTask } from '../actions/taskActions';
-import { checkTaskOverlap, resolveOverlaps } from '../utils/dateUtils'; 
-import { setError } from '../actions/errorActions'; 
+import { checkTaskOverlap } from '../utils/dateUtils';
+import { setError } from '../actions/errorActions';
 import { showDialog } from '../actions/dialogActions';
-import { LockedDate } from './LockedDate'; // 👈 Import it
-import './LockedDate.css'; 
-import './TaskCommandBar.css';
+import { LockedDate } from './LockedDate';
+import { Check, Circle, Trash2 } from 'lucide-react';
 import type { Task } from '../types';
-import { Trash2 } from 'lucide-react';
+import './LockedDate.css';
+import './TaskCommandBar.css';
 
 interface TaskCommandBarProps {
   isOpen: boolean;
@@ -22,252 +22,161 @@ interface TaskCommandBarProps {
 export const TaskCommandBar: React.FC<TaskCommandBarProps> = ({
   isOpen, onClose, selectedHour, selectedDate, editingTask
 }) => {
-
   const dispatch = useDispatch();
   const taskTypes = useSelector((state: RootState) => state.tasks.taskTypes);
-  const allTasks = useSelector((state: RootState) => state.tasks.tasks); 
+  const allTasks = useSelector((state: RootState) => state.tasks.tasks);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  const inputRef = useRef<HTMLInputElement>(null);
-
+  // Form State
   const [details, setDetails] = useState('');
   const [typeId, setTypeId] = useState('');
-  const [isDateEditable, setIsDateEditable] = useState(false);
- 
-useEffect(() => {
-  if (taskTypes.length > 0 && !typeId) {
-    setTypeId(taskTypes[0].id);
-  }
-}, [taskTypes, typeId]);
+  const [isDone, setIsDone] = useState(false);
+  const [startDateTime, setStartDateTime] = useState<Date>(new Date());
+  const [endDateTime, setEndDateTime] = useState<Date>(new Date());
+  const [startTimeStr, setStartTimeStr] = useState('');
+  const [endTimeStr, setEndTimeStr] = useState('');
 
-  // 1. Derive the exact Start and End Dates directly from props
-  const getInitialDates = () => {
-    if (!selectedDate) return { start: new Date(), end: new Date() };
-    const start = new Date(selectedDate);
-    start.setHours(selectedHour, 0, 0, 0);
-    const end = new Date(start);
-    end.setHours(end.getHours() + 1);
-    return { start, end };
-  };
+  // Helpers
+  const toTimeStr = (d: Date) => `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 
-  /*
-  const handleDelete = () => {
-    if (editingTask) {
-      // Optional: Add a window.confirm here if you want to be extra safe
-      dispatch(deleteTask(editingTask.id));
-      onClose();
+  // 👇 Single, unified useEffect for initialization
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // 1. Ensure a task type is selected
+    if (taskTypes.length > 0 && !typeId) {
+      setTypeId(taskTypes[0].id);
     }
+
+    // 2. Setup dates and fields based on Add vs Edit mode
+    if (editingTask) {
+      // EDIT MODE
+      const start = new Date(editingTask.from_datetime);
+      const end = new Date(editingTask.to_datetime);
+      setStartDateTime(start);
+      setEndDateTime(end);
+      setStartTimeStr(toTimeStr(start));
+      setEndTimeStr(toTimeStr(end));
+      setDetails(editingTask.task_details);
+      setTypeId(editingTask.task_type_id);
+      setIsDone(editingTask.status === 'done');
+    } else {
+      // ADD MODE
+      const start = new Date(selectedDate);
+      start.setHours(selectedHour, 0, 0, 0);
+      const end = new Date(start);
+      end.setHours(end.getHours() + 1);
+
+      setStartDateTime(start);
+      setEndDateTime(end);
+      setStartTimeStr(toTimeStr(start));
+      setEndTimeStr(toTimeStr(end));
+      setDetails('');
+      
+      // Smart Default: Past dates default to Done
+      const isPast = start.getTime() < new Date().getTime();
+      setIsDone(isPast);
+    }
+
+    // 3. Focus the textarea after the slide-up animation
+    setTimeout(() => inputRef.current?.focus(), 350);
+    
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isOpen, editingTask, selectedDate, selectedHour]); 
+
+  const handleStartTimeChange = (timeStr: string) => {
+    setStartTimeStr(timeStr);
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    if (isNaN(hours) || isNaN(minutes)) return;
+
+    const newStart = new Date(startDateTime);
+    newStart.setHours(hours, minutes);
+    setStartDateTime(newStart);
   };
-  */
+
+  const handleEndTimeChange = (timeStr: string) => {
+    setEndTimeStr(timeStr);
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    if (isNaN(hours) || isNaN(minutes)) return;
+
+    const newEnd = new Date(endDateTime);
+    newEnd.setHours(hours, minutes);
+    setEndDateTime(newEnd);
+  };
 
   const handleDeleteClick = () => {
-    console.log("handleDeleteClick...0...");
     if (!editingTask) return;
-
-    console.log("handleDeleteClick...1...");
-    // 👇 Pass the actual delete logic as a callback
     dispatch(showDialog(
       'Delete Task?',
       'Are you sure you want to delete this task? This action cannot be undone.',
       'Delete',
       () => {
         dispatch(deleteTask(editingTask.id));
-        onClose(); // Close the Command Bar after deleting
+        onClose();
       }
     ));
-    console.log("handleDeleteClick...2...");
-  };
-
-  const initDates = getInitialDates();
-  const [startDateTime, setStartDateTime] = useState<Date>(initDates.start);
-  const [endDateTime, setEndDateTime] = useState<Date>(initDates.end);
-  const [startTimeStr, setStartTimeStr] = useState('');
-  const [endTimeStr, setEndTimeStr] = useState('');
-
-  // Sync state if a NEW cell is clicked
-  useEffect(() => {
-    if (isOpen) {
-
-      if (editingTask) {
-
-        // EDIT MODE
-        const start = new Date(editingTask.from_datetime);
-        const end = new Date(editingTask.to_datetime);
-        setStartDateTime(start);
-        setEndDateTime(end);
-        setStartTimeStr(toTimeStr(start));
-        setEndTimeStr(toTimeStr(end));
-        setDetails(editingTask.task_details);
-        setTypeId(editingTask.task_type_id);
-
-      } else {
-
-        const { start, end } = getInitialDates();
-        setStartDateTime(start);
-        setEndDateTime(end);
-        setDetails('');
-         
-        if (taskTypes.length > 0 && !typeId) {
-          setTypeId(taskTypes[0].id);
-        }
-
-      }
-
-      setIsDateEditable(false);
-
-      setTimeout(() => inputRef.current?.focus(), 350);
-    }
-  //  
-  }, [isOpen, selectedHour, selectedDate, editingTask]);
-
-  const toDateStr = (d: Date) => {
-    const y = d.getFullYear();
-    const m = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${y}-${m}-${day}`;
-  };
-
-  const toTimeStr = (d: Date) => {
-    return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-  };
-
-    const handleStartTimeChange = (timeStr: string) => {
-    const [hours, minutes] = timeStr.split(':').map(Number);
-    const newStart = new Date(startDateTime);
-    newStart.setHours(hours, minutes);
-    
-    setStartDateTime(newStart);
-
-    // Check if the new start time is AFTER the existing end time (on the same date)
-    // If so, the user is probably trying to extend the task, so we push the end time forward.
-    /*
-    if (newStart.getTime() >= endDateTime.getTime()) {
-      const newEnd = new Date(newStart);
-      newEnd.setHours(newEnd.getHours() + 1); // Default to 1 hour duration
-      setEndDateTime(newEnd);
-    }
-    */
-    
-     
-  };
-
-  const handleEndTimeChange = (timeStr: string) => {
-    const [hours, minutes] = timeStr.split(':').map(Number);
-    const newEnd = new Date(endDateTime);
-    
-    // 1. Set the new time on the EXISTING end date
-    newEnd.setHours(hours, minutes);
-
-    // 2. Compare only the Time portions (HH:mm) to see if the user is trying to cross midnight
-    const startTimeVal = startDateTime.getHours() * 60 + startDateTime.getMinutes();
-    const endTimeVal = hours * 60 + minutes;
-
-    setEndDateTime(newEnd);
-    
-    /*
-    if (endTimeVal < startTimeVal) {
-      // User typed an End Time earlier than Start Time (e.g., Start 23:00, End 02:00)
-      // Set end date to the day AFTER the start date.
-      newEnd.setFullYear(startDateTime.getFullYear(), startDateTime.getMonth(), startDateTime.getDate());
-      newEnd.setDate(newEnd.getDate() + 1);
-    } else {
-      // User typed an End Time later than Start Time (e.g., Start 10:00, End 12:00)
-      // Force the end date to match the start date exactly (prevents the weird 1-day jump bug)
-      newEnd.setFullYear(startDateTime.getFullYear(), startDateTime.getMonth(), startDateTime.getDate());
-    }
-    */
-    
-     
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!details.trim() || !typeId) return;
 
-    //const result = resolveOverlaps(startDateTime, endDateTime, allTasks, editingTask?.id );
+    // Check for overlaps
     const { hasOverlap, conflictingTask } = checkTaskOverlap(
-      startDateTime, 
-      endDateTime, 
-      allTasks, 
-      editingTask?.id 
+      startDateTime, endDateTime, allTasks, editingTask?.id 
     );
 
-    // 2. Block if overlap exists
     if (hasOverlap) {
       const conflictStart = conflictingTask ? new Date(conflictingTask.from_datetime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
       const conflictEnd = conflictingTask ? new Date(conflictingTask.to_datetime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
-      
-      // alert(`Time conflict! You already have a task from ${conflictStart} to ${conflictEnd}. You cannot log two tasks at the same time.`);
-      
       dispatch(setError(`Time conflict! You already have a task from ${conflictStart} to ${conflictEnd}.`));
-
       return; 
     }
 
+    const finalStatus = isDone ? 'done' : 'planned';
+
     if (editingTask) {
-        dispatch(updateTask({
-                ...editingTask,
-                from_datetime: startDateTime.toISOString(),
-                from_timestamp: startDateTime.getTime(),
-                to_datetime: endDateTime.toISOString(),
-                to_timestamp: endDateTime.getTime(),
-                task_details: details.trim(),
-                task_type_id: typeId,
-              }));
-
-    }
-    else {
-
+      dispatch(updateTask({
+        ...editingTask,
+        from_datetime: startDateTime.toISOString(),
+        from_timestamp: startDateTime.getTime(),
+        to_datetime: endDateTime.toISOString(),
+        to_timestamp: endDateTime.getTime(),
+        task_details: details.trim(),
+        task_type_id: typeId,
+        status: finalStatus, // 👈 Save the status
+      }));
+    } else {
       dispatch(addTask(
-      startDateTime.toISOString(), 
-      endDateTime.toISOString(), 
-      details.trim(), 
-      typeId
-    ));
-
+        startDateTime.toISOString(), 
+        endDateTime.toISOString(), 
+        details.trim(), 
+        typeId,
+        finalStatus // 👈 Save the status
+      ));
     }
-     
     
-    onClose(); // This triggers the slide down
+    onClose();
   };
 
   return (
     <>
-      {/* 1. Backdrop: Catches clicks outside to close the bar */}
-      <div 
-        className={`command-bar-backdrop ${isOpen ? 'open' : ''}`} 
-        onClick={onClose} 
-      />
+      <div className={`command-bar-backdrop ${isOpen ? 'open' : ''}`} onClick={onClose} />
 
-      {/* 2. The actual Slide-Up Bar */}
       <div className={`command-bar-wrapper ${isOpen ? 'open' : ''}`}>
-
-        
-
-      
         <form 
           className="command-bar-content" 
           onSubmit={handleSubmit}
-          onClick={(e) => e.stopPropagation()} // Stop clicks inside the form from closing it
+          onClick={(e) => e.stopPropagation()}
         >
-
-            
-
-
-          {/* LEFT COLUMN (Auto width based on content) */}
+          {/* LEFT COLUMN */}
           <div className="command-left-col">
             <div className="time-section">
-
               <div className="time-group">
                 <label>Start</label>
                 <div className="time-inputs">
-                  <input type="time" value={toTimeStr(startDateTime)} onChange={(e) => handleStartTimeChange(e.target.value)} required />
-                  <div className={`date-badge ${isDateEditable ? 'editable' : ''}`} onClick={() => setIsDateEditable(!isDateEditable)}>
-                     
-                    <LockedDate 
-                      date={startDateTime} 
-                      onChange={(newDate) => setStartDateTime(newDate)} 
-                    />
-                  </div>
+                  <input type="time" value={startTimeStr} onChange={(e) => handleStartTimeChange(e.target.value)} required />
+                  <LockedDate date={startDateTime} onChange={(newDate) => setStartDateTime(newDate)} />
                 </div>
               </div>
 
@@ -276,93 +185,66 @@ useEffect(() => {
               <div className="time-group">
                 <label>End</label>
                 <div className="time-inputs">
-                  <input type="time" value={toTimeStr(endDateTime)} onChange={(e) => handleEndTimeChange(e.target.value)} required />
-                  <div className={`date-badge ${isDateEditable ? 'editable' : ''}`} onClick={() => setIsDateEditable(!isDateEditable)}>
-                   
-                    <LockedDate 
-                      date={endDateTime} 
-                      onChange={(newDate) => setEndDateTime(newDate)} 
-                    />
-
-                  </div>
+                  <input type="time" value={endTimeStr} onChange={(e) => handleEndTimeChange(e.target.value)} required />
+                  <LockedDate date={endDateTime} onChange={(newDate) => setEndDateTime(newDate)} />
                 </div>
               </div>
             </div>
 
-          
-                      
             <div className="task-section">
-              
-              <select 
-                className="type-select" 
-                value={typeId} 
-                onChange={(e) => setTypeId(e.target.value)}
-              >
+              <select className="type-select" value={typeId} onChange={(e) => setTypeId(e.target.value)}>
                 {taskTypes.map((t) => (
                   <option key={t.id} value={t.id}>{t.name}</option>
                 ))}
               </select>
 
- 
-              
-              {/* 👇 ADDED SUBMIT BUTTON */}
-              <button type="submit" 
-                className="submit-btn" 
-                disabled={!details.trim() || !typeId}>
+              <label className="status-checkbox-label">
+                <input 
+                  type="checkbox" 
+                  checked={isDone} 
+                  onChange={(e) => setIsDone(e.target.checked)} 
+                  className="hidden-checkbox"
+                />
+                <div className="custom-checkbox">
+                  {isDone ? <Check size={14} /> : <Circle size={14} />}
+                </div>
+                <span className="checkbox-text">{isDone ? 'Completed' : 'Planned'}</span>
+              </label>
+
+              <button type="submit" className="submit-btn" disabled={!details.trim() || !typeId}>
                 {editingTask ? 'Update' : 'Save'}
               </button>
-
             </div>
-
           </div>
 
-
-
-
-
-          {/* RIGHT COLUMN (Takes all remaining space) */}
+          {/* RIGHT COLUMN */}
           <div className="command-right-col">
-
-           
-      
-           <div className="command-bar-header">
-            {/* 👇 Top Header (Only shows when editing) */}
+            {/* Delete Button (Only in Edit Mode) */}
             {editingTask && (
-              
               <button 
-                    type="button" 
-                    className="delete-icon-btn" 
-                    onClick={handleDeleteClick}
-                    title="Delete Task"
-                  >
-                  <Trash2 size={18} />
+                type="button" 
+                className="delete-icon-btn" 
+                onClick={handleDeleteClick}
+                title="Delete Task"
+              >
+                <Trash2 size={18} />
               </button>
             )}
 
             <textarea 
-              ref={inputRef as any}
+              ref={inputRef}
               className="task-textarea" 
               placeholder="Enter task details..." 
               value={details} 
               onChange={(e) => setDetails(e.target.value)} 
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSubmit(e as any);
+                }
+              }}
             />
-
-             
-
-           </div>
-             
-
-             
-
-             
-
           </div>
-
-
- 
-           
-
-        
         </form>
       </div>
     </>

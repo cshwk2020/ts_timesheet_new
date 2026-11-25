@@ -10,6 +10,8 @@ import CalendarDayView from './CalendarDayView';
 import CalendarWeekView from './CalendarWeekView';
 import CalendarMonthView from './CalendarMonthView';
 import CalendarYearView from './CalendarYearView';
+import { TaskTypeManager } from './TaskTypeManager';
+import { AppHeader } from './AppHeader';
 import { setCurrentDate } from '../actions/calendarActions';
 import { CalendarNavigator } from './CalendarNavigator';
 
@@ -24,6 +26,8 @@ const CalendarMain: React.FC = () => {
   
   // Grab the currentDate from Redux
   const currentDateStr = useSelector((state: RootState) => state.calendar.currentDate);
+  const viewMode = useSelector((state: RootState) => state.calendar.viewMode);
+
   const currentDate = new Date(currentDateStr);
 
   
@@ -113,24 +117,15 @@ const CalendarMain: React.FC = () => {
   return (
     <div className="calendar-main">
       
-      {/* View Toggle */}
-       <div className="sticky-top-bar">
-        <div className="switch-toggle">
-          {['day', 'week', 'month'].map((view) => (
-            <button
-              key={view}
-              onClick={() => setCurrentView(view as any)}
-              className={`switch-toggle-btn ${currentView === view ? 'active' : ''}`}
-            >
-              {view.charAt(0).toUpperCase() + view.slice(1)}
-            </button>
-          ))}
-        </div>
-      </div>
+      <AppHeader />
+
+
+ 
 
       {/* 👇 The isolated Navigator handles all headers */}
       <CalendarNavigator viewMode={currentView} />
 
+      
   
 
       {errorMessage && (
@@ -146,22 +141,24 @@ const CalendarMain: React.FC = () => {
       )}
 
 
+   
+
       {/* Grid (Click to open bar) */}
       <div className="view-container" style={{ paddingBottom: '100px' }}>
         
-        {currentView === 'day' && <CalendarDayView 
+        {viewMode === 'day' && <CalendarDayView 
           onCellClick={handleCellClick} 
           onTaskClick={handleTaskClick} 
         />}
 
-        {currentView === 'week' && (
+        {viewMode === 'week' && (
           <CalendarWeekView 
             onCellClick={handleCellClick} 
             onTaskClick={handleTaskClick} 
           />
         )}
 
-        {currentView === 'month' && (
+        {viewMode === 'month' && (
           <CalendarMonthView 
             onCellClick={handleCellClick} 
             onTaskClick={handleTaskClick} 
@@ -187,7 +184,12 @@ const CalendarMain: React.FC = () => {
         selectedHour={clickedHour} 
         editingTask={editingTask}
       />
+
+      <TaskTypeManager /> 
+
     </div>
+
+
   );
 };
 
