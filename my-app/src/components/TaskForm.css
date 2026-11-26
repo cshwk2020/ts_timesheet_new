@@ -1,0 +1,76 @@
+/* =========================================
+   TASK FORM
+   ========================================= */
+.task-form-container {
+  max-width: 400px;
+  margin: 40px auto;
+  padding: 24px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  position: relative; /* For positioning the overlay if scoped */
+}
+
+.task-form-title {
+  font-size: 1.25rem;
+  margin-top: 0;
+  margin-bottom: 16px;
+  color: var(--text);
+}
+
+.task-form-toast {
+  padding: 12px;
+  margin-bottom: 16px;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.task-form-toast.success {
+  background-color: #d1fae5;
+  color: #065f46;
+  border: 1px solid #10b981;
+}
+
+.task-form-toast.error {
+  background-color: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #ef4444;
+}
+
+.task-form-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 16px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--code-bg);
+  color: var(--text);
+  box-sizing: border-box;
+}
+
+.task-form-input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(var(--accent-rgb, 59, 130, 246), 0.2);
+}
+
+.task-form-button {
+  width: 100%;
+  padding: 10px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.task-form-button:hover:not(:disabled) {
+  opacity: 0.9;
+}
+
+.task-form-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

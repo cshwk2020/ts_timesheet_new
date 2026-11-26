@@ -3,12 +3,16 @@ import { useSelector, useDispatch } from 'react-redux';
 import { type RootState } from '../reducers';
 import { setViewMode, toggleTaskTypeManager } from '../actions/calendarActions';
 import { Menu, Settings, List, X } from 'lucide-react'; // 👈 Import List and X
+import { useAuth } from '../context/AuthContext';
 import './AppHeader.css';
 
 export const AppHeader: React.FC = () => {
     
   const dispatch = useDispatch();
+  const { user, logout } = useAuth();
+
   const viewMode = useSelector((state: RootState) => state.calendar.viewMode);
+  
   
   // 👇 State for the hamburger menu
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -30,6 +34,13 @@ export const AppHeader: React.FC = () => {
     setIsMenuOpen(false); // Close menu after clicking
   };
 
+  const handleLogout = async () => {
+    if (window.confirm('Are you sure you want to log out?')) {
+      await logout();
+      // AuthGate will handle unmounting the app and showing Login
+    }
+  };
+
   return (
     <header className="app-header">
       <div className="header-left" ref={menuRef}>
@@ -46,6 +57,9 @@ export const AppHeader: React.FC = () => {
               <List size={16} />
               Manage Task Types
             </button>
+            <button className="dropdown-logout" onClick={handleLogout}>
+                Log Out
+              </button>
             <button className="nav-item" onClick={() => { setIsMenuOpen(false); alert('Settings coming soon!'); }}>
               <Settings size={16} />
               Settings

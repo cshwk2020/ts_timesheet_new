@@ -1,7 +1,7 @@
 // src/reducers/taskReducer.ts
 import {
   type TaskState,
-  type TaskActionTypes,
+  type TaskAction,
   ADD_TASK,
   SET_TASK_TYPES,
   UPDATE_TASK,
@@ -18,7 +18,7 @@ const initialState: TaskState = {
 
 const taskReducer = (
   state = initialState,
-  action: TaskActionTypes
+  action: TaskAction
 ): TaskState => {
   switch (action.type) {
 

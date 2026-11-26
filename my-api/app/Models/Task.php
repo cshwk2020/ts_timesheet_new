@@ -2,18 +2,36 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\BelongsToUser;
 
-class Task extends Model {
-    protected $fillable = ['user_id', 'category_id', 'name', 'description', 'is_active'];
+class Task extends Model
+{
+    use HasUuids, SoftDeletes, BelongsToUser;
 
-    public function category(): BelongsTo {
-        return $this->belongsTo(TaskCategory::class, 'category_id');
-    }
+    protected $fillable = [
+        'from_datetime',
+        'to_datetime',
+        'from_timestamp',
+        'to_timestamp',
+        'task_details',
+        'task_type_id',
+        'status',
+        // 'user_id' is handled automatically by BelongsToUser
+    ];
 
-    public function timesheetRecords(): HasMany {
-        return $this->hasMany(TimesheetRecord::class, 'task_id');
+    protected $casts = [
+        'from_datetime' => 'datetime',
+        'to_datetime' => 'datetime',
+        'from_timestamp' => 'integer',
+        'to_timestamp' => 'integer',
+    ];
+
+    // A Task belongs to a TaskType
+    public function taskType()
+    {
+        return $this->belongsTo(TaskType::class, 'task_type_id');
     }
 }

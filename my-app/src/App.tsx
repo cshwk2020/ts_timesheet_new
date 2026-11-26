@@ -3,7 +3,9 @@ import React, { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { fetchTaskTypes } from './services/taskTypeService';
 import { setTaskTypes } from './actions/taskActions';
-import CalendarMain from './components/CalendarMain'; // Or your TaskList
+import CalendarMain from './components/CalendarMain';  
+import { AuthProvider } from './context/AuthContext';
+import { AuthGate } from './components/AuthGate';
 import './App.css';
 
 function App() {
@@ -17,9 +19,15 @@ function App() {
   }, [dispatch]);
 
   return (
-    <div className="App">
-      <CalendarMain />
-    </div>
+    <AuthProvider>
+      <AuthGate>
+        <div className="App">
+          <CalendarMain />
+        </div>
+      </AuthGate>
+     
+    </AuthProvider>
+    
   );
 }
 

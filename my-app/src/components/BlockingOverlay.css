@@ -1,0 +1,49 @@
+/* =========================================
+   BLOCKING OVERLAY
+   ========================================= */
+.blocking-overlay-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(2px);
+  /* Prevents all clicks on the UI behind it */
+  pointer-events: auto; 
+}
+
+.blocking-overlay-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--bg);
+  padding: 24px 32px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.blocking-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.blocking-text {
+  margin-top: 16px;
+  font-weight: 500;
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

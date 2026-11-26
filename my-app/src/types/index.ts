@@ -2,6 +2,32 @@
 
  
 
+// --- AUTH TYPES ---
+export interface User {
+  user_id: string;
+  username: string;
+}
+
+export interface AuthState {
+  user: User | null;
+  token: string | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  error: string | null;
+}
+
+
+export type AuthAction =
+  | { type: 'AUTH_START' } // e.g., when logging in or checking storage
+  | { type: 'AUTH_SUCCESS'; payload: { user: User; token: string } }
+  | { type: 'AUTH_FAILURE'; payload: string }
+  | { type: 'AUTH_LOGOUT' }
+  | { type: 'AUTH_INITIALIZED'; payload: { user: User; token: string } | null };
+
+
+
+
+//
 export interface CalendarState {
   currentDate: string;  
   viewMode: 'day' | 'week' | 'month';  
@@ -123,7 +149,7 @@ interface UpdateTaskTypeAction {
 }
 
 //
-export type TaskActionTypes = AddTaskAction | SetTaskTypesAction | UpdateTaskAction | DeleteTaskAction | AddTaskTypeAction | UpdateTaskTypeAction | ToggleTaskStatusAction;
+export type TaskAction = AddTaskAction | SetTaskTypesAction | UpdateTaskAction | DeleteTaskAction | AddTaskTypeAction | UpdateTaskTypeAction | ToggleTaskStatusAction;
 
 
 
@@ -176,7 +202,7 @@ interface HideDialogAction {
 
 // ALL Actions
 
-export type AppActionTypes = TaskActionTypes 
+export type AppActionTypes = TaskAction
   | SetErrorAction 
   | ClearErrorAction 
   | ShowDialogAction 
@@ -185,7 +211,8 @@ export type AppActionTypes = TaskActionTypes
   | SetViewModeAction 
   | ToggleTaskTypeManagerAction 
   | SetCurrentDateAction
-  | ToggleTaskTypeManagerAction;
+  | TaskAction
+  | AuthAction;
 
 
 
