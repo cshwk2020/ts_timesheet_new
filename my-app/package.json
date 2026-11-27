@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@reduxjs/toolkit": "^2.13.0",
+    "@reduxjs/toolkit": "^2.15.0",
     "@types/redux": "^3.6.31",
     "@types/redux-logger": "^3.0.13",
     "axios": "^1.21.1",
@@ -20,7 +20,8 @@
     "react-dom": "^19.3.1",
     "react-redux": "^9.3.1",
     "redux": "^5.0.1",
-    "redux-logger": "^3.0.6"
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^3.1.0"
   },
   "devDependencies": {
     "@types/node": "^24.19.2",

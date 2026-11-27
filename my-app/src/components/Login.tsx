@@ -1,21 +1,20 @@
 import React, { useState } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useDispatch, useSelector } from 'react-redux';
+import type { RootState } from '../reducers'; // Ensure this path is correct
+import { loginAsync } from '../actions/authThunks';
 import './Login.css';
 
 export const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   
-  // Now pulling isLoading and error directly from the reducer state!
-  const { login, isLoading, error } = useAuth();
+  const dispatch = useDispatch();
+  const { isLoading, error } = useSelector((state: RootState) => state.auth);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await login(username, password);
-    } catch (err) {
-      // Error is already handled in the reducer, so we don't need local state for it
-    }
+    // Standard dispatch. The 'as any' prevents TS from complaining about thunks if you haven't typed the store.
+    dispatch(loginAsync(username, password) as any); 
   };
 
   return (
@@ -56,4 +55,3 @@ export const Login = () => {
     </div>
   );
 };
-

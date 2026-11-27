@@ -3,13 +3,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { type RootState } from '../reducers';
 import { addTask, updateTask, deleteTask } from '../actions/taskActions';
 import { checkTaskOverlap } from '../utils/dateUtils';
+import { BlockingOverlay } from './BlockingOverlay';
 import { setError } from '../actions/errorActions';
+
 import { showDialog } from '../actions/dialogActions';
 import { LockedDate } from './LockedDate';
 import { Check, Circle, Trash2 } from 'lucide-react';
 import type { Task } from '../types';
 import './LockedDate.css';
 import './TaskCommandBar.css';
+import { createTaskAsync, updateTaskAsync } from '../actions/taskThunks';
 
 interface TaskCommandBarProps {
   isOpen: boolean;
@@ -38,6 +41,9 @@ export const TaskCommandBar: React.FC<TaskCommandBarProps> = ({
 
   // Helpers
   const toTimeStr = (d: Date) => `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+
+  const [isSaving, setIsSaving] = useState(false);  
+  
 
   // 👇 Single, unified useEffect for initialization
   useEffect(() => {
@@ -117,9 +123,11 @@ export const TaskCommandBar: React.FC<TaskCommandBarProps> = ({
     ));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+
+  
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!details.trim() || !typeId) return;
+    if (!details.trim() || !typeId || isSaving) return;
 
     // Check for overlaps
     const { hasOverlap, conflictingTask } = checkTaskOverlap(
@@ -135,32 +143,48 @@ export const TaskCommandBar: React.FC<TaskCommandBarProps> = ({
 
     const finalStatus = isDone ? 'done' : 'planned';
 
-    if (editingTask) {
-      dispatch(updateTask({
-        ...editingTask,
-        from_datetime: startDateTime.toISOString(),
-        from_timestamp: startDateTime.getTime(),
-        to_datetime: endDateTime.toISOString(),
-        to_timestamp: endDateTime.getTime(),
-        task_details: details.trim(),
-        task_type_id: typeId,
-        status: finalStatus, // 👈 Save the status
-      }));
-    } else {
-      dispatch(addTask(
-        startDateTime.toISOString(), 
-        endDateTime.toISOString(), 
-        details.trim(), 
-        typeId,
-        finalStatus // 👈 Save the status
-      ));
+    // Prepare the payload based on your TS interface
+    const taskPayload = {
+      ...editingTask,
+      from_datetime: startDateTime.toISOString(),
+      from_timestamp: startDateTime.getTime(),
+      to_datetime: endDateTime.toISOString(),
+      to_timestamp: endDateTime.getTime(),
+      task_details: details.trim(),
+      task_type_id: typeId,
+      status: finalStatus,
+    };
+
+    setIsSaving(true); // 👈 Start blocking overlay
+
+    try {
+      if (editingTask) {
+        // 👈 Dispatch thunk (no dispatch argument needed)
+        await dispatch(updateTaskAsync(taskPayload as Task) as any);
+      } else {
+        // 👈 Dispatch thunk (no dispatch argument needed)
+        await dispatch(createTaskAsync(taskPayload as Task) as any);
+      }
+      
+      onClose(); // Only close modal on success
+    } catch (error) {
+      // The thunk throws an error if Laravel rejects it (e.g., 500 or 403)
+      dispatch(setError("Failed to save task. Please check the server and try again."));
+      // Keep the modal open so the user doesn't lose their input!
+    } finally {
+      setIsSaving(false); // 👈 Stop blocking overlay
     }
-    
-    onClose();
   };
+
+
+
 
   return (
     <>
+    <div className="task-command-bar-wrapper">
+      {/* 👈 Show the overlay while talking to Laravel */}
+      <BlockingOverlay isLoading={isSaving} text="Saving to Server..." />
+      
       <div className={`command-bar-backdrop ${isOpen ? 'open' : ''}`} onClick={onClose} />
 
       <div className={`command-bar-wrapper ${isOpen ? 'open' : ''}`}>
@@ -246,6 +270,7 @@ export const TaskCommandBar: React.FC<TaskCommandBarProps> = ({
             />
           </div>
         </form>
+      </div>
       </div>
     </>
   );

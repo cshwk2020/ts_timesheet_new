@@ -8,7 +8,8 @@ import {
   DELETE_TASK,
   ADD_TASK_TYPE, 
   UPDATE_TASK_TYPE,
-  TOGGLE_TASK_STATUS 
+  TOGGLE_TASK_STATUS, 
+  SET_TASKS
 } from '../types';
 
 const initialState: TaskState = {
@@ -47,6 +48,12 @@ const taskReducer = (
         return {
           ...state,
           taskTypes: action.payload,
+        };
+
+    case SET_TASKS:
+        return {
+          ...state,
+          tasks: action.payload,
         };
 
     case ADD_TASK_TYPE:

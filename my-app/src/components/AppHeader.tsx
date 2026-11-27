@@ -1,22 +1,28 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
+import { Menu, Settings, List, X } from 'lucide-react'; // 👈 Import List and X
 import { type RootState } from '../reducers';
 import { setViewMode, toggleTaskTypeManager } from '../actions/calendarActions';
-import { Menu, Settings, List, X } from 'lucide-react'; // 👈 Import List and X
-import { useAuth } from '../context/AuthContext';
+import { logoutAsync } from '../actions/authThunks';
 import './AppHeader.css';
 
 export const AppHeader: React.FC = () => {
     
   const dispatch = useDispatch();
-  const { user, logout } = useAuth();
-
+ 
   const viewMode = useSelector((state: RootState) => state.calendar.viewMode);
-  
+  const { user } = useSelector((state: RootState) => state.auth);
   
   // 👇 State for the hamburger menu
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+
+  const handleLogout = () => {
+    if (window.confirm('Are you sure you want to log out?')) {
+      // Dispatch the logout thunk from Redux
+      dispatch(logoutAsync() as any);
+    }
+  };
 
   // Close menu if clicked outside
   useEffect(() => {
@@ -34,12 +40,7 @@ export const AppHeader: React.FC = () => {
     setIsMenuOpen(false); // Close menu after clicking
   };
 
-  const handleLogout = async () => {
-    if (window.confirm('Are you sure you want to log out?')) {
-      await logout();
-      // AuthGate will handle unmounting the app and showing Login
-    }
-  };
+ 
 
   return (
     <header className="app-header">
@@ -53,17 +54,32 @@ export const AppHeader: React.FC = () => {
         {/* 👇 The Dropdown Menu */}
         {isMenuOpen && (
           <div className="nav-dropdown">
+
+
+            <div className="nav-item">
+             {user?.username || 'User'} 
+            </div>  
+ 
+
+
             <button className="nav-item" onClick={handleOpenTaskTypes}>
               <List size={16} />
               Manage Task Types
             </button>
-            <button className="dropdown-logout" onClick={handleLogout}>
-                Log Out
-              </button>
+ 
+ 
             <button className="nav-item" onClick={() => { setIsMenuOpen(false); alert('Settings coming soon!'); }}>
               <Settings size={16} />
               Settings
             </button>
+
+
+             
+            <button className="dropdown-logout" onClick={handleLogout}>
+                Log Out
+            </button>
+            
+
           </div>
         )}
       </div>

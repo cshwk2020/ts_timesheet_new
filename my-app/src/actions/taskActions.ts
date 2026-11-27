@@ -1,4 +1,4 @@
-import { ADD_TASK_TYPE, UPDATE_TASK_TYPE, ADD_TASK, DELETE_TASK, SET_TASK_TYPES, UPDATE_TASK, TOGGLE_TASK_STATUS, type Task, type TaskType } from '../types';
+import { ADD_TASK_TYPE, UPDATE_TASK_TYPE, ADD_TASK, DELETE_TASK, SET_TASK_TYPES, UPDATE_TASK, TOGGLE_TASK_STATUS, type Task, type TaskType, SET_TASKS } from '../types';
 import { generateId } from '../utils/dateUtils';
 
 /**
@@ -50,6 +50,13 @@ export const setTaskTypes = (taskTypes: TaskType[]) => {
   };
 };
 
+
+export const setTasks = (tasks: Task[]) => {
+  return {
+    type: SET_TASKS,
+    payload: tasks,
+  };
+};
 
 export const addTaskType = (name: string, color: string) => {
   const newType: TaskType = { id: generateId(), name, color };

@@ -4,29 +4,40 @@ import { useDispatch } from 'react-redux';
 import { fetchTaskTypes } from './services/taskTypeService';
 import { setTaskTypes } from './actions/taskActions';
 import CalendarMain from './components/CalendarMain';  
-import { AuthProvider } from './context/AuthContext';
+ 
 import { AuthGate } from './components/AuthGate';
 import './App.css';
+import { initializeAuthAsync } from './actions/authThunks';
 
 function App() {
   const dispatch = useDispatch();
 
-  // Fetch types ONCE when the app loads
-  useEffect(() => {
-    fetchTaskTypes().then((types) => {
-      dispatch(setTaskTypes(types));
-    });
+   useEffect(() => {
+    
+    //
+    dispatch(initializeAuthAsync() as any);
+   
+    //
+    const handleExpired = () => {
+      // Force Redux state to logout instantly
+      dispatch({ type: 'AUTH_LOGOUT' });
+    };
+
+    window.addEventListener('auth_expired', handleExpired);
+    return () => window.removeEventListener('auth_expired', handleExpired);
+    
   }, [dispatch]);
 
+
   return (
-    <AuthProvider>
+ 
       <AuthGate>
         <div className="App">
           <CalendarMain />
         </div>
       </AuthGate>
      
-    </AuthProvider>
+     
     
   );
 }

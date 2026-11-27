@@ -2,9 +2,11 @@ import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { type RootState } from '../reducers';
 import { toggleTaskTypeManager } from '../actions/calendarActions';
-import { addTaskType, updateTaskType } from '../actions/taskActions';
+//
+import { addTaskTypeAsync, updateTaskTypeAsync } from '../actions/taskThunks'; 
 import { X, Check, Plus } from 'lucide-react';
 import './TaskTypeManager.css';
+
 
 export const TaskTypeManager: React.FC = () => {
   const dispatch = useDispatch();
@@ -12,23 +14,44 @@ export const TaskTypeManager: React.FC = () => {
   const taskTypes = useSelector((state: RootState) => state.tasks.taskTypes);
 
   const [newTypeName, setNewTypeName] = useState('');
-  const [newTypeColor, setNewTypeColor] = useState('#3461ff'); // Default blue
+  const [newTypeColor, setNewTypeColor] = useState('#3461ff');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState('');
+  
+  // Add loading states so buttons can disable while saving
+  const [isSaving, setIsSaving] = useState(false);
 
   if (!isOpen) return null;
 
-  const handleAdd = (e: React.FormEvent) => {
+  const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTypeName.trim()) return;
-    dispatch(addTaskType(newTypeName.trim(), newTypeColor));
-    setNewTypeName('');
+    if (!newTypeName.trim() || isSaving) return;
+    
+    setIsSaving(true);
+    try {
+      // 👈 Dispatch the async thunk (Laravel + Redux)
+      await dispatch(addTaskTypeAsync(newTypeName.trim(), newTypeColor) as any);
+      setNewTypeName(''); // Only clear on success
+    } catch (error) {
+      alert("Failed to add task type. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
-  const handleSaveEdit = (type: any) => {
-    if (!editName.trim()) return;
-    dispatch(updateTaskType({ ...type, name: editName.trim() }));
-    setEditingId(null);
+  const handleSaveEdit = async (type: any) => {
+    if (!editName.trim() || isSaving) return;
+
+    setIsSaving(true);
+    try {
+      // 👈 Dispatch the async thunk (Laravel + Redux)
+      await dispatch(updateTaskTypeAsync({ ...type, name: editName.trim() }) as any);
+      setEditingId(null); // Only close edit mode on success
+    } catch (error) {
+      alert("Failed to update task type. Please try again.");
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -43,6 +66,12 @@ export const TaskTypeManager: React.FC = () => {
         </div>
 
         <div className="type-list">
+          {taskTypes.length === 0 && (
+             <p style={{ textAlign: 'center', color: '#888', padding: '20px' }}>
+               No task types yet. Add one below!
+             </p>
+          )}
+          
           {taskTypes.map((type) => (
             <div key={type.id} className="type-row">
               <div className="color-indicator" style={{ backgroundColor: type.color || '#ccc' }} />
@@ -54,16 +83,30 @@ export const TaskTypeManager: React.FC = () => {
                     value={editName} 
                     onChange={(e) => setEditName(e.target.value)}
                     autoFocus
+                    disabled={isSaving}
                     onKeyDown={(e) => e.key === 'Enter' && handleSaveEdit(type)}
                   />
-                  <button className="save-btn" onClick={() => handleSaveEdit(type)}><Check size={16} /></button>
-                  <button className="cancel-btn" onClick={() => setEditingId(null)}><X size={16} /></button>
+                  <button 
+                    className="save-btn" 
+                    onClick={() => handleSaveEdit(type)}
+                    disabled={isSaving}
+                  >
+                    <Check size={16} />
+                  </button>
+                  <button 
+                    className="cancel-btn" 
+                    onClick={() => setEditingId(null)}
+                    disabled={isSaving}
+                  >
+                    <X size={16} />
+                  </button>
                 </div>
               ) : (
                 <div className="view-mode">
                   <span>{type.name}</span>
                   <button 
                     className="edit-trigger"
+                    disabled={isSaving}
                     onClick={() => { setEditingId(type.id); setEditName(type.name); }}
                   >
                     Edit
@@ -79,6 +122,7 @@ export const TaskTypeManager: React.FC = () => {
             type="color" 
             value={newTypeColor} 
             onChange={(e) => setNewTypeColor(e.target.value)} 
+            disabled={isSaving}
             title="Pick a color"
           />
           <input 
@@ -86,8 +130,11 @@ export const TaskTypeManager: React.FC = () => {
             placeholder="New task type..." 
             value={newTypeName}
             onChange={(e) => setNewTypeName(e.target.value)}
+            disabled={isSaving}
           />
-          <button type="submit" className="add-btn"><Plus size={18} /> Add</button>
+          <button type="submit" className="add-btn" disabled={isSaving || !newTypeName.trim()}>
+            {isSaving ? 'Saving...' : <><Plus size={18} /> Add</>}
+          </button>
         </form>
 
       </div>

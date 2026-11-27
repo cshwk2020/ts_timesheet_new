@@ -63,7 +63,8 @@ interface ToggleTaskTypeManagerAction {
  
 // Action Types
 export const ADD_TASK = 'ADD_TASK';
-export const SET_TASK_TYPES = 'SET_TASK_TYPES';   // 👈 new: hydrate types from DB
+export const SET_TASK_TYPES = 'SET_TASK_TYPES';
+export const SET_TASKS = 'SET_TASKS';
 export const UPDATE_TASK = 'UPDATE_TASK';
 export const DELETE_TASK = 'DELETE_TASK';
 export const ADD_TASK_TYPE = 'ADD_TASK_TYPE';
@@ -127,6 +128,10 @@ export interface SetTaskTypesAction {
   payload: TaskType[];
 }
 
+export interface SetTasksAction {
+  type: typeof SET_TASKS;
+  payload: Task[];
+}
 
 export interface UpdateTaskAction {
   type: typeof UPDATE_TASK;
@@ -149,7 +154,7 @@ interface UpdateTaskTypeAction {
 }
 
 //
-export type TaskAction = AddTaskAction | SetTaskTypesAction | UpdateTaskAction | DeleteTaskAction | AddTaskTypeAction | UpdateTaskTypeAction | ToggleTaskStatusAction;
+export type TaskAction = AddTaskAction | SetTaskTypesAction | UpdateTaskAction | DeleteTaskAction | AddTaskTypeAction | UpdateTaskTypeAction | SetTasksAction | ToggleTaskStatusAction;
 
 
 

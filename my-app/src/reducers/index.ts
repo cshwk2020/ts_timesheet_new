@@ -3,6 +3,7 @@ import calendarReducer from './calendarReducer';
 import taskReducer from './taskReducer';
 import errorReducer from './errorReducer'; // 👈 Import it
 import dialogReducer from './dialogReducer';
+import { authReducer } from './authReducer';
 
 
 const rootReducer = combineReducers({
@@ -10,6 +11,7 @@ const rootReducer = combineReducers({
   tasks: taskReducer,
   error: errorReducer,  
   dialog: dialogReducer,
+  auth: authReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;  // 👈 defined here

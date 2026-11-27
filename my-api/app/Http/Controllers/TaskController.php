@@ -3,13 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Models\Task;
+use App\Models\TaskType;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class TaskController extends Controller
 {
     // listAllTasks
     public function index(Request $request)
     {
+        Log::error("TaskController");
+
         $userId = $request->header('X-User-Id'); // Or auth()->user()->user_id
         
         // Explicit where clause (defense in depth)

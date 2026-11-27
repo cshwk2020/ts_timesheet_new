@@ -1,5 +1,6 @@
 import React from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useSelector } from 'react-redux';
+import { type RootState } from '../reducers'; // Ensure this path is correct
 import { Login } from './Login';
 
 interface Props {
@@ -7,18 +8,18 @@ interface Props {
 }
 
 export const AuthGate: React.FC<Props> = ({ children }) => {
-  const { user, isLoading } = useAuth();
+  const { user, isLoading } = useSelector((state: RootState) => state.auth);
 
-  // 1. Wait for AuthProvider to check localStorage
+  // 1. Wait for the initializeAuthAsync to finish checking localStorage
   if (isLoading) {
     return (
       <div style={{ display: 'flex', height: '100vh', justifyContent: 'center', alignItems: 'center' }}>
-        Loading...
+        Loading application...
       </div>
     );
   }
 
-  // 2. No user -> Force Login Page
+  // 2. No user -> Force Login
   if (!user) {
     return <Login />;
   }

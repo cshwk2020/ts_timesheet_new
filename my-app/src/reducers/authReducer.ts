@@ -1,14 +1,14 @@
-import type { AuthState, AuthAction } from '../types'; // Assuming you put AuthAction in types or actions
+import type { AuthState, AuthAction } from '../types';
 
 export const initialAuthState: AuthState = {
   user: null,
   token: null,
   isAuthenticated: false,
-  isLoading: true, // true initially while we check localStorage
+  isLoading: true, // Starts as true to block app until localStorage is checked
   error: null,
 };
 
-export const authReducer = (state: AuthState, action: AuthAction): AuthState => {
+export const authReducer = (state = initialAuthState, action: AuthAction): AuthState => {
   switch (action.type) {
     case 'AUTH_START':
       return { ...state, isLoading: true, error: null };
@@ -40,7 +40,6 @@ export const authReducer = (state: AuthState, action: AuthAction): AuthState => 
       };
       
     case 'AUTH_INITIALIZED':
-      // Used on app load to set state from localStorage without flashing errors
       if (action.payload) {
         return {
           ...state,

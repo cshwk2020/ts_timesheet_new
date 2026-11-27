@@ -14,6 +14,8 @@ class JwtAuthMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
+        dd('Our custom JwtAuthMiddleware is running!');
+
         $authHeader = $request->header('Authorization');
         if (!$authHeader || !str_starts_with($authHeader, 'Bearer ')) {
             return response()->json(['error' => 'Missing token'], 401);

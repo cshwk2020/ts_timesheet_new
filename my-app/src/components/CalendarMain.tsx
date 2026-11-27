@@ -15,7 +15,11 @@ import { AppHeader } from './AppHeader';
 import { setCurrentDate } from '../actions/calendarActions';
 import { CalendarNavigator } from './CalendarNavigator';
 
+ 
+
+
 import './CalendarModalHeader.css';
+import { loadTasksAsync } from '../actions/taskThunks';
 
 
 const CalendarMain: React.FC = () => {
@@ -47,6 +51,31 @@ const CalendarMain: React.FC = () => {
     console.log("Current Redux dialog state:", state.dialog);
     return state.dialog?.message;
   });
+
+
+  // update tasks from DB
+  const [isLoading, setIsLoading] = useState(true);
+  const { user } = useSelector((state: RootState) => state.auth);
+
+ 
+
+   useEffect(() => {
+
+    console.log(`DEBUG CALENDAR MAIN,,,,,,user==`, user);
+    
+      if (!user) return;
+
+      dispatch(loadTasksAsync() as any)
+      .catch((err: any) => console.error("Initial load failed", err))
+      .finally(() => setIsLoading(false));
+      
+  }, [dispatch, user]);
+
+  if (isLoading) return <div>Loading Calendar...</div>;
+
+
+
+
 
   // 1. OPEN: Triggered by clicking a cell
   const handleCellClick = (date: Date, hour: number) => {
@@ -119,14 +148,9 @@ const CalendarMain: React.FC = () => {
       
       <AppHeader />
 
-
- 
-
       {/* 👇 The isolated Navigator handles all headers */}
       <CalendarNavigator viewMode={currentView} />
 
-      
-  
 
       {errorMessage && (
         <ErrorModal 
