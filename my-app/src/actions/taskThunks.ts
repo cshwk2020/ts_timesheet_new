@@ -2,9 +2,11 @@
 import { apiUpdateTask, apiDeleteTask, apiToggleTask, apiCreateTask, apiFetchTasks, apiFetchTaskTypes } from '../api/tasks';
 import type { TaskType, Task, TaskAction } from '../types';
 import { apiClient } from '../api/client';
- 
+ import { HIDE_GLOBAL_OVERLAY, SHOW_GLOBAL_OVERLAY } from '../types';
+import { UiMessages } from '../constants/uiMessages';
 
 export const loadTasksAsync = () => async (dispatch: any) => {
+  
   try {
     console.log(`loadTasksAsync...0...`);
     const [tasks, taskTypes] = await Promise.all([
@@ -31,7 +33,13 @@ export const loadTasksAsync = () => async (dispatch: any) => {
 
 // 1. Update Task
 export const updateTaskAsync = (task: Task) => async (dispatch: any) =>  {
+
+  console.log(`DEBUG updateTaskAsync,,,,,task==`,task);
+
   try {
+    
+    dispatch({ type: SHOW_GLOBAL_OVERLAY , payload: UiMessages.SAVING});
+
     // 1. Call Laravel
     const savedTask = await apiUpdateTask(task.id, task);
     
@@ -40,45 +48,77 @@ export const updateTaskAsync = (task: Task) => async (dispatch: any) =>  {
   } catch (error) {
     // Handle error (e.g., show toast)
     console.error("Failed to update task", error);
+    throw error;
+  }
+  finally {
+
+     dispatch({ type: HIDE_GLOBAL_OVERLAY });
   }
 };
 
+ 
 // 2. Toggle Status
-export const toggleTaskAsync = async (
-  taskId: string, 
-  dispatch: React.Dispatch<TaskAction>
-) => {
+export const toggleTaskAsync = (taskId: string) => async (dispatch: any) => {
+
   try {
+    
+    dispatch({ type: SHOW_GLOBAL_OVERLAY , payload: UiMessages.SAVING});
+
     const updatedTask = await apiToggleTask(taskId);
     // Dispatch the full updated task returned by Laravel
     dispatch({ type: 'UPDATE_TASK', payload: updatedTask }); 
   } catch (error) {
     console.error("Failed to toggle task", error);
+    throw error;
+  }
+  finally {
+
+     dispatch({ type: HIDE_GLOBAL_OVERLAY });
   }
 };
  
  
 // 3. Delete Task
-export const deleteTaskAsync = (taskId: string) => async (dispatch: any) => {
+ export const deleteTaskAsync = (taskId: string) => async (dispatch: any) => {
+  
   try {
+
+    dispatch({ type: SHOW_GLOBAL_OVERLAY , payload: UiMessages.DELETING});
+
     await apiDeleteTask(taskId);
     dispatch({ type: 'DELETE_TASK', payload: taskId });
+
   } catch (error) {
     console.error("Failed to delete task", error);
+    throw error;
+
+  } 
+  finally {
+
+     dispatch({ type: HIDE_GLOBAL_OVERLAY });
   }
 };
 
  
 // 4. Create Task (Save)
 export const createTaskAsync = (newTaskData: Partial<Task>) => async (dispatch: any) => {
+  
   try {
+
+    dispatch({ type: SHOW_GLOBAL_OVERLAY , payload: UiMessages.SAVING});
+
     const newTask = await apiCreateTask(newTaskData);
     // Add to state using the DB-generated ID
     dispatch({ type: 'ADD_TASK', payload: newTask });
-  } catch (error) {
+    
+  } 
+  catch (error) {
     console.error("Failed to create task", error);
     throw error; 
     // Re-throw so the form can catch it and show a spinner error
+  }
+  finally {
+     dispatch({ type: HIDE_GLOBAL_OVERLAY });
   }
 };
 
@@ -91,7 +131,11 @@ export const createTaskAsync = (newTaskData: Partial<Task>) => async (dispatch: 
 
 // 1. Create Task Type
 export const addTaskTypeAsync = (name: string, color: string) => async (dispatch: any) => {
+  
   try {
+
+    dispatch({ type: SHOW_GLOBAL_OVERLAY , payload: UiMessages.SAVING});
+
     const newType = await apiClient('/task-types', {
       method: 'POST',
       body: JSON.stringify({ name, color }),
@@ -99,23 +143,37 @@ export const addTaskTypeAsync = (name: string, color: string) => async (dispatch
     
     // Dispatch the exact server payload to update the local store
     dispatch({ type: 'ADD_TASK_TYPE', payload: newType });
-  } catch (error) {
+  } 
+  catch (error) {
     console.error("Failed to add task type", error);
     throw error;
   }
+  finally {
+     dispatch({ type: HIDE_GLOBAL_OVERLAY });
+  }
+  
 };
 
 // 2. Update Task Type
 export const updateTaskTypeAsync = (taskType: TaskType) => async (dispatch: any) => {
+
   try {
+
+    dispatch({ type: SHOW_GLOBAL_OVERLAY , payload: UiMessages.SAVING});
+
     const updatedType = await apiClient(`/task-types/${taskType.id}`, {
       method: 'PUT',
       body: JSON.stringify({ name: taskType.name, color: taskType.color }),
     });
     
     dispatch({ type: 'UPDATE_TASK_TYPE', payload: updatedType });
-  } catch (error) {
+
+  } 
+  catch (error) {
     console.error("Failed to update task type", error);
     throw error;
+  }
+  finally {
+     dispatch({ type: HIDE_GLOBAL_OVERLAY });
   }
 };

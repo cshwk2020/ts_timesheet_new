@@ -176,6 +176,21 @@
   width: 100%;
 }
 
+
+.task-section-row-wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content:space-between;
+  align-items: center;
+}
+
+.task-section-item-rightmost {
+    display: flex;
+    justify-content: flex-end;
+}
+
+
+
 /* Inputs and Dropdowns */
 .type-select {
   flex: 1;
@@ -229,6 +244,7 @@
 .command-right-col {
   flex: 1; 
   display: flex;
+  flex-direction: column;
   align-items: stretch; 
   min-width: 0; 
 }

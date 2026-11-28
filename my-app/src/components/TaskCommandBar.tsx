@@ -2,17 +2,22 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { type RootState } from '../reducers';
 import { addTask, updateTask, deleteTask } from '../actions/taskActions';
+import { ErrorMessages } from '../constants/errorMessages';
+import { getErrorMessage } from '../utils/errorHandler';
+
 import { checkTaskOverlap } from '../utils/dateUtils';
 import { BlockingOverlay } from './BlockingOverlay';
-import { setError } from '../actions/errorActions';
+import { StarRating } from './StarRating';
 
+import { setError } from '../actions/errorActions';
 import { showDialog } from '../actions/dialogActions';
 import { LockedDate } from './LockedDate';
 import { Check, Circle, Trash2 } from 'lucide-react';
 import type { Task } from '../types';
+import '../common.css';
 import './LockedDate.css';
 import './TaskCommandBar.css';
-import { createTaskAsync, updateTaskAsync } from '../actions/taskThunks';
+import { createTaskAsync, updateTaskAsync, deleteTaskAsync } from '../actions/taskThunks';
 
 interface TaskCommandBarProps {
   isOpen: boolean;
@@ -38,12 +43,15 @@ export const TaskCommandBar: React.FC<TaskCommandBarProps> = ({
   const [endDateTime, setEndDateTime] = useState<Date>(new Date());
   const [startTimeStr, setStartTimeStr] = useState('');
   const [endTimeStr, setEndTimeStr] = useState('');
-
+ 
   // Helpers
   const toTimeStr = (d: Date) => `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 
   const [isSaving, setIsSaving] = useState(false);  
-  
+
+  const [difficulty, setDifficulty] = useState<number>(
+    editingTask?.difficulty_level || 0
+  );
 
   // 👇 Single, unified useEffect for initialization
   useEffect(() => {
@@ -66,6 +74,8 @@ export const TaskCommandBar: React.FC<TaskCommandBarProps> = ({
       setDetails(editingTask.task_details);
       setTypeId(editingTask.task_type_id);
       setIsDone(editingTask.status === 'done');
+      setDifficulty(editingTask.difficulty_level);
+
     } else {
       // ADD MODE
       const start = new Date(selectedDate);
@@ -82,6 +92,7 @@ export const TaskCommandBar: React.FC<TaskCommandBarProps> = ({
       // Smart Default: Past dates default to Done
       const isPast = start.getTime() < new Date().getTime();
       setIsDone(isPast);
+      setDifficulty(0);
     }
 
     // 3. Focus the textarea after the slide-up animation
@@ -110,18 +121,47 @@ export const TaskCommandBar: React.FC<TaskCommandBarProps> = ({
     setEndDateTime(newEnd);
   };
 
+
   const handleDeleteClick = () => {
-    if (!editingTask) return;
-    dispatch(showDialog(
-      'Delete Task?',
-      'Are you sure you want to delete this task? This action cannot be undone.',
-      'Delete',
-      () => {
-        dispatch(deleteTask(editingTask.id));
-        onClose();
-      }
-    ));
-  };
+
+      if (!editingTask) return;
+        
+    // 1. Clear any old errors so the banner is empty
+    dispatch({ type: 'CLEAR_ERROR' });
+
+    // 2. Show the dialog
+    dispatch(
+      showDialog(
+        'Delete Task?',
+        'Are you sure you want to delete this task? This action cannot be undone.',
+        'Delete',
+        async () => {
+          // 3. This runs when the user clicks "Delete" in the dialog
+          //setIsSaving(true);
+          try {
+            await dispatch(deleteTaskAsync(editingTask.id) as any);
+            onClose(); // Close the slide-up form on success
+          } catch (error) {
+            console.error("Delete failed:", error);
+            
+            // 4. Dispatch the error. The Global ErrorBanner will catch this.
+            /*
+            dispatch(
+              setError('Failed to delete task. Network disconnected or server error.')
+            );
+            */
+            dispatch(setError(getErrorMessage(error, ErrorMessages.TASK_DELETE)));
+
+            
+            // Important: If your Dialog component automatically hides itself
+            // when the callback finishes, the error banner will still show at the top of the screen.
+          } finally {
+            //setIsSaving(false);
+          }
+        }
+      )
+    );
+};
 
 
   
@@ -138,6 +178,7 @@ export const TaskCommandBar: React.FC<TaskCommandBarProps> = ({
       const conflictStart = conflictingTask ? new Date(conflictingTask.from_datetime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
       const conflictEnd = conflictingTask ? new Date(conflictingTask.to_datetime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '';
       dispatch(setError(`Time conflict! You already have a task from ${conflictStart} to ${conflictEnd}.`));
+      
       return; 
     }
 
@@ -153,9 +194,14 @@ export const TaskCommandBar: React.FC<TaskCommandBarProps> = ({
       task_details: details.trim(),
       task_type_id: typeId,
       status: finalStatus,
+      difficulty_level: difficulty,
     };
 
-    setIsSaving(true); // 👈 Start blocking overlay
+
+    console.log(`DEBUG...handleSubmit...taskPayload==`, taskPayload);
+
+
+    //setIsSaving(true); // 👈 Start blocking overlay
 
     try {
       if (editingTask) {
@@ -167,16 +213,19 @@ export const TaskCommandBar: React.FC<TaskCommandBarProps> = ({
       }
       
       onClose(); // Only close modal on success
+
     } catch (error) {
       // The thunk throws an error if Laravel rejects it (e.g., 500 or 403)
-      dispatch(setError("Failed to save task. Please check the server and try again."));
-      // Keep the modal open so the user doesn't lose their input!
+      //dispatch(setError("Failed to save task. Please check the server and try again."));
+      dispatch(setError(getErrorMessage(error, ErrorMessages.TASK_SAVE)));
+      
+      
+      onClose();
+      
     } finally {
-      setIsSaving(false); // 👈 Stop blocking overlay
+      //setIsSaving(false); // 👈 Stop blocking overlay
     }
   };
-
-
 
 
   return (
@@ -222,37 +271,57 @@ export const TaskCommandBar: React.FC<TaskCommandBarProps> = ({
                 ))}
               </select>
 
-              <label className="status-checkbox-label">
-                <input 
-                  type="checkbox" 
-                  checked={isDone} 
-                  onChange={(e) => setIsDone(e.target.checked)} 
-                  className="hidden-checkbox"
-                />
-                <div className="custom-checkbox">
-                  {isDone ? <Check size={14} /> : <Circle size={14} />}
-                </div>
-                <span className="checkbox-text">{isDone ? 'Completed' : 'Planned'}</span>
-              </label>
 
+              <div className="util-row-wrapper">
+
+                <div>
+                  <label className="status-checkbox-label">
+                    <input 
+                      type="checkbox" 
+                      checked={isDone} 
+                      onChange={(e) => setIsDone(e.target.checked)} 
+                      className="hidden-checkbox"
+                    />
+                    <div className="custom-checkbox">
+                      {isDone ? <Check size={14} /> : <Circle size={14} />}
+                    </div>
+                    <span className="checkbox-text">{isDone ? 'Completed' : 'Planned'}</span>
+                  </label>
+                </div>
+
+                <div>
+                  <StarRating 
+                    value={difficulty} 
+                    onChange={(val:number) => setDifficulty(val)} 
+                  />
+                </div>
+
+
+              </div>
+               
+                
               <button type="submit" className="submit-btn" disabled={!details.trim() || !typeId}>
                 {editingTask ? 'Update' : 'Save'}
               </button>
             </div>
           </div>
 
+
+
           {/* RIGHT COLUMN */}
           <div className="command-right-col">
             {/* Delete Button (Only in Edit Mode) */}
             {editingTask && (
-              <button 
-                type="button" 
-                className="delete-icon-btn" 
-                onClick={handleDeleteClick}
-                title="Delete Task"
-              >
-                <Trash2 size={18} />
-              </button>
+              <div className='util-row_item-rightmost'>
+                <button 
+                  type="button" 
+                  className="delete-icon-btn" 
+                  onClick={handleDeleteClick}
+                  title="Delete Task"
+                >
+                  <Trash2 size={18} />
+                </button>
+              </div>
             )}
 
             <textarea 

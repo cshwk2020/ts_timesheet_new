@@ -33,6 +33,7 @@ class TaskController extends Controller
             'to_timestamp' => 'required|integer',
             'task_type_id' => 'required|uuid|exists:task_types,id',
             'status' => 'required|in:planned,done',
+            'difficulty_level' => 'required|numeric',
         ]);
 
         $userId = $request->header('X-User-Id');
@@ -69,6 +70,7 @@ class TaskController extends Controller
             'to_timestamp' => 'sometimes|integer',
             'task_type_id' => 'sometimes|uuid|exists:task_types,id',
             'status' => 'sometimes|in:planned,done',
+            'difficulty_level' => 'required|numeric',
         ]);
 
         if (isset($validated['task_type_id'])) {

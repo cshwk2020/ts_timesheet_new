@@ -19,6 +19,7 @@ class Task extends Model
         'task_details',
         'task_type_id',
         'status',
+        'difficulty_level', 
         // 'user_id' is handled automatically by BelongsToUser
     ];
 
@@ -27,6 +28,7 @@ class Task extends Model
         'to_datetime' => 'datetime',
         'from_timestamp' => 'integer',
         'to_timestamp' => 'integer',
+        'difficulty_level' => 'float', 
     ];
 
     // A Task belongs to a TaskType

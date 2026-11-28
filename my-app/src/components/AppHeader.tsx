@@ -5,6 +5,11 @@ import { type RootState } from '../reducers';
 import { setViewMode, toggleTaskTypeManager } from '../actions/calendarActions';
 import { logoutAsync } from '../actions/authThunks';
 import './AppHeader.css';
+import { showDialog } from '../actions/dialogActions';
+import { setError } from '../actions/errorActions';
+import { getErrorMessage } from '../utils/errorHandler';
+import { ErrorMessages } from '../constants/errorMessages';
+ 
 
 export const AppHeader: React.FC = () => {
     
@@ -17,12 +22,67 @@ export const AppHeader: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
+  const [isLogout, setIsLogout] = useState(false);
+
+   
+
   const handleLogout = () => {
+
+    /*
     if (window.confirm('Are you sure you want to log out?')) {
       // Dispatch the logout thunk from Redux
       dispatch(logoutAsync() as any);
     }
+    */
+ 
+
+    dispatch({ type: 'CLEAR_ERROR' });
+    
+        // 2. Show the dialog
+        dispatch(
+          showDialog(
+            'Confirm?',
+            'Are you sure you want to log out?',
+            'Logout',
+            async () => {
+              // 3. This runs when the user clicks "Delete" in the dialog
+               
+              try {
+                console.log('DEBUG LOGOUT...0...');
+                await dispatch(logoutAsync() as any);
+                console.log('DEBUG LOGOUT...10...');
+                 
+              } catch (error) {
+                console.error("Logout failed:", error);
+                console.log('DEBUG LOGOUT...20...');
+                
+                // 4. Dispatch the error. The Global ErrorBanner will catch this.
+                /*
+                dispatch(
+                  setError('Failed to delete task. Network disconnected or server error.')
+                );
+                */
+               
+                dispatch(setError(getErrorMessage(error, ErrorMessages.AUTH_LOGOUT)));
+    
+                
+                // Important: If your Dialog component automatically hides itself
+                // when the callback finishes, the error banner will still show at the top of the screen.
+              } finally {
+                //dispatch({ type: 'CLEAR_ERROR' });
+                
+              }
+            }
+          )
+        );
+
   };
+
+
+
+
+
+
 
   // Close menu if clicked outside
   useEffect(() => {
@@ -111,3 +171,5 @@ export const AppHeader: React.FC = () => {
     </header>
   );
 };
+
+ 

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { TaskCommandBar } from './TaskCommandBar';
-import { clearError } from '../actions/errorActions';
+import { clearError, setError } from '../actions/errorActions';
+import { ErrorMessages } from '../constants/errorMessages';
+import { getErrorMessage } from '../utils/errorHandler';
 import type { Task } from '../types';
 import type { RootState } from '../reducers';
 import { useDispatch, useSelector } from 'react-redux';
@@ -20,6 +22,7 @@ import { CalendarNavigator } from './CalendarNavigator';
 
 import './CalendarModalHeader.css';
 import { loadTasksAsync } from '../actions/taskThunks';
+import { BlockingOverlay } from './BlockingOverlay';
 
 
 const CalendarMain: React.FC = () => {
@@ -65,14 +68,28 @@ const CalendarMain: React.FC = () => {
     
       if (!user) return;
 
+
       dispatch(loadTasksAsync() as any)
-      .catch((err: any) => console.error("Initial load failed", err))
+      .catch((error: any) => {
+        console.error("Initial load failed", error);
+        /*
+        dispatch(
+              setError('Failed to load tasks, Network disconnected or server error.')
+        );
+        */
+
+        dispatch(setError(getErrorMessage(error, ErrorMessages.TASK_LOAD)));
+
+      })
       .finally(() => setIsLoading(false));
       
   }, [dispatch, user]);
 
-  if (isLoading) return <div>Loading Calendar...</div>;
 
+  if (isLoading) return <BlockingOverlay isLoading={isLoading} text="Loading Calendar..." />;
+
+ 
+        
 
 
 
@@ -146,18 +163,15 @@ const CalendarMain: React.FC = () => {
   return (
     <div className="calendar-main">
       
+   
+      {errorMessage && (
+        <ErrorModal />
+      )}
+
       <AppHeader />
 
       {/* 👇 The isolated Navigator handles all headers */}
       <CalendarNavigator viewMode={currentView} />
-
-
-      {errorMessage && (
-        <ErrorModal 
-        message={errorMessage} 
-        onClose={() => dispatch(clearError())} 
-      />
-      )}
 
 
       {dialogMessage && (

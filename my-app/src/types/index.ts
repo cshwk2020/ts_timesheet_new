@@ -99,6 +99,7 @@ export interface Task {
   task_details: string;
   task_type_id: string;
   status: 'planned' | 'done';
+  difficulty_level: number;
 }
 
 
@@ -158,6 +159,25 @@ export type TaskAction = AddTaskAction | SetTaskTypesAction | UpdateTaskAction |
 
 
 
+// Loading Overlay
+
+export interface UIState {
+  isLoading: boolean;
+  message: string;
+}
+
+export const SHOW_GLOBAL_OVERLAY = 'SHOW_GLOBAL_OVERLAY';
+export const HIDE_GLOBAL_OVERLAY = 'HIDE_GLOBAL_OVERLAY';
+ 
+export interface ShowGlobalOverlayAction {
+  type: typeof SHOW_GLOBAL_OVERLAY;
+  payload: string;
+}
+
+export interface HideGlobalOverlayAction {
+  type: typeof HIDE_GLOBAL_OVERLAY;
+}
+
 
 // ERROR Actions
 
@@ -208,6 +228,8 @@ interface HideDialogAction {
 // ALL Actions
 
 export type AppActionTypes = TaskAction
+  | ShowGlobalOverlayAction
+  | HideGlobalOverlayAction
   | SetErrorAction 
   | ClearErrorAction 
   | ShowDialogAction 

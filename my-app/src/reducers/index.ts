@@ -4,11 +4,13 @@ import taskReducer from './taskReducer';
 import errorReducer from './errorReducer'; // 👈 Import it
 import dialogReducer from './dialogReducer';
 import { authReducer } from './authReducer';
+import { uiReducer } from './uiReducer';
 
 
 const rootReducer = combineReducers({
   calendar: calendarReducer, 
   tasks: taskReducer,
+  ui: uiReducer,
   error: errorReducer,  
   dialog: dialogReducer,
   auth: authReducer,

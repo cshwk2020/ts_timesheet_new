@@ -9,7 +9,8 @@ export const addTask = (
   to_datetime: string,
   task_details: string,
   task_type_id: string,
-  status: 'planned' | 'done' 
+  status: 'planned' | 'done',
+  difficulty_level: number
 ) => {
   const newTask: Task = {
     id: generateId(),
@@ -19,7 +20,8 @@ export const addTask = (
     to_timestamp: new Date(to_datetime).getTime(),   
     task_details,
     task_type_id,
-    status
+    status,
+    difficulty_level
   };
 
   return {
@@ -29,6 +31,9 @@ export const addTask = (
 };
 
 export const updateTask = (updatedTask: Task) => {
+
+  console.log(`DEBUG updateTask==`, updatedTask);
+
   return {
     type: UPDATE_TASK,
     payload: updatedTask,

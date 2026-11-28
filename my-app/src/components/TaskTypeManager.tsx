@@ -6,6 +6,9 @@ import { toggleTaskTypeManager } from '../actions/calendarActions';
 import { addTaskTypeAsync, updateTaskTypeAsync } from '../actions/taskThunks'; 
 import { X, Check, Plus } from 'lucide-react';
 import './TaskTypeManager.css';
+import { setError } from '../actions/errorActions';
+import { ErrorMessages } from '../constants/errorMessages';
+import { getErrorMessage } from '../utils/errorHandler';
 
 
 export const TaskTypeManager: React.FC = () => {
@@ -28,12 +31,21 @@ export const TaskTypeManager: React.FC = () => {
     if (!newTypeName.trim() || isSaving) return;
     
     setIsSaving(true);
+
     try {
       // 👈 Dispatch the async thunk (Laravel + Redux)
       await dispatch(addTaskTypeAsync(newTypeName.trim(), newTypeColor) as any);
       setNewTypeName(''); // Only clear on success
     } catch (error) {
-      alert("Failed to add task type. Please try again.");
+      //alert("Failed to add task type. Please try again.");
+      /*
+      dispatch(
+          setError('Failed to add task type, Network disconnected or server error.')
+      );
+      */
+      dispatch(setError(getErrorMessage(error, ErrorMessages.TASK_TYPE_SAVE)));
+            
+
     } finally {
       setIsSaving(false);
     }
@@ -48,7 +60,9 @@ export const TaskTypeManager: React.FC = () => {
       await dispatch(updateTaskTypeAsync({ ...type, name: editName.trim() }) as any);
       setEditingId(null); // Only close edit mode on success
     } catch (error) {
-      alert("Failed to update task type. Please try again.");
+      //alert("Failed to update task type. Please try again.");
+      dispatch(setError(getErrorMessage(error, ErrorMessages.TASK_TYPE_SAVE)));
+      
     } finally {
       setIsSaving(false);
     }

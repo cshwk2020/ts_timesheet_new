@@ -8,6 +8,7 @@ import CalendarMain from './components/CalendarMain';
 import { AuthGate } from './components/AuthGate';
 import './App.css';
 import { initializeAuthAsync } from './actions/authThunks';
+import { GlobalBlockingOverlay } from './components/GlobalBlockingOverlay';
 
 function App() {
   const dispatch = useDispatch();
@@ -31,11 +32,16 @@ function App() {
 
   return (
  
+    <>
+      <GlobalBlockingOverlay />
+      
       <AuthGate>
         <div className="App">
           <CalendarMain />
         </div>
       </AuthGate>
+    </>
+      
      
      
     
