@@ -30,9 +30,11 @@ export const TaskTypeManager: React.FC = () => {
     e.preventDefault();
     if (!newTypeName.trim() || isSaving) return;
     
-    setIsSaving(true);
+    //setIsSaving(true);
 
     try {
+      dispatch({ type: 'CLEAR_ERROR' });
+
       // 👈 Dispatch the async thunk (Laravel + Redux)
       await dispatch(addTaskTypeAsync(newTypeName.trim(), newTypeColor) as any);
       setNewTypeName(''); // Only clear on success
@@ -47,24 +49,27 @@ export const TaskTypeManager: React.FC = () => {
             
 
     } finally {
-      setIsSaving(false);
+      //setIsSaving(false);
     }
   };
 
   const handleSaveEdit = async (type: any) => {
     if (!editName.trim() || isSaving) return;
 
-    setIsSaving(true);
+    //setIsSaving(true);
     try {
-      // 👈 Dispatch the async thunk (Laravel + Redux)
+      
+      dispatch({ type: 'CLEAR_ERROR' });
+
       await dispatch(updateTaskTypeAsync({ ...type, name: editName.trim() }) as any);
       setEditingId(null); // Only close edit mode on success
+
     } catch (error) {
       //alert("Failed to update task type. Please try again.");
       dispatch(setError(getErrorMessage(error, ErrorMessages.TASK_TYPE_SAVE)));
       
     } finally {
-      setIsSaving(false);
+      //setIsSaving(false);
     }
   };
 

@@ -13,6 +13,7 @@ export const initializeAuthAsync = () => (dispatch: any) => {
       const user: User = JSON.parse(userStr);
       dispatch({ type: 'AUTH_INITIALIZED', payload: { user, token } });
     } catch (e) {
+      console.log(`DEBUG...initializeAuthAsync...localStorage.removeItem`);
       // Corrupt storage fallback
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user_info');
@@ -34,6 +35,7 @@ export const loginAsync = (username: string, password: string) => async (dispatc
       body: JSON.stringify({ username, password }),
     });
 
+  
     localStorage.setItem('auth_token', res.token);
     localStorage.setItem('user_info', JSON.stringify(res.user_info));
     
@@ -63,6 +65,7 @@ export const logoutAsync = () => async (dispatch: any) => {
     dispatch({ type: 'AUTH_FAILURE', payload: msg });
 
   } finally {
+    console.log(`DEBUG...logoutAsync...localStorage.removeItem`);
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user_info');
     dispatch({ type: 'AUTH_LOGOUT' });

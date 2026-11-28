@@ -38,6 +38,7 @@ export const apiClient = async (endpoint: string, options: RequestInit = {}) => 
     console.error(`API Error [${response.status}] on ${endpoint}:`, errorData);
 
     if (response.status === 401) {
+       
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user_info');
       window.dispatchEvent(new Event('auth_expired'));

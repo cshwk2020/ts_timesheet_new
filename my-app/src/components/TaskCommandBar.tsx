@@ -47,7 +47,7 @@ export const TaskCommandBar: React.FC<TaskCommandBarProps> = ({
   // Helpers
   const toTimeStr = (d: Date) => `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
 
-  const [isSaving, setIsSaving] = useState(false);  
+  
 
   const [difficulty, setDifficulty] = useState<number>(
     editingTask?.difficulty_level || 0
@@ -166,8 +166,9 @@ export const TaskCommandBar: React.FC<TaskCommandBarProps> = ({
 
   
   const handleSubmit = async (e: React.FormEvent) => {
+
     e.preventDefault();
-    if (!details.trim() || !typeId || isSaving) return;
+    if (!details.trim() || !typeId ) return;
 
     // Check for overlaps
     const { hasOverlap, conflictingTask } = checkTaskOverlap(
@@ -204,6 +205,9 @@ export const TaskCommandBar: React.FC<TaskCommandBarProps> = ({
     //setIsSaving(true); // 👈 Start blocking overlay
 
     try {
+
+      dispatch({ type: 'CLEAR_ERROR' });
+      
       if (editingTask) {
         // 👈 Dispatch thunk (no dispatch argument needed)
         await dispatch(updateTaskAsync(taskPayload as Task) as any);
@@ -218,9 +222,7 @@ export const TaskCommandBar: React.FC<TaskCommandBarProps> = ({
       // The thunk throws an error if Laravel rejects it (e.g., 500 or 403)
       //dispatch(setError("Failed to save task. Please check the server and try again."));
       dispatch(setError(getErrorMessage(error, ErrorMessages.TASK_SAVE)));
-      
-      
-      onClose();
+       
       
     } finally {
       //setIsSaving(false); // 👈 Stop blocking overlay
@@ -231,9 +233,7 @@ export const TaskCommandBar: React.FC<TaskCommandBarProps> = ({
   return (
     <>
     <div className="task-command-bar-wrapper">
-      {/* 👈 Show the overlay while talking to Laravel */}
-      <BlockingOverlay isLoading={isSaving} text="Saving to Server..." />
-      
+       
       <div className={`command-bar-backdrop ${isOpen ? 'open' : ''}`} onClick={onClose} />
 
       <div className={`command-bar-wrapper ${isOpen ? 'open' : ''}`}>
